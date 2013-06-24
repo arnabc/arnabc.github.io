@@ -1,0 +1,264 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>PhoneGap - How does it work - Arnab Chakraborty</title>
+	<meta name="author" content="Arnab Chakraborty">
+
+	
+	<meta name="description" content="PhoneGap - How Does It Work PhoneGap is an open-source cross-platform Mobile Application development framework by Nitobi Software (now Adobe) which &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Arnab Chakraborty" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://arnab.ch/blog/2011/12/phonegap-how-does-it-work/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			  <header id="header" role="banner" class="inner"><div class="profilepic">	
+  <img src="http://www.gravatar.com/avatar/0eeaf53af64209dc60b475c49ed5a853?s=160" alt="Arnab Chakraborty" style="width: 160px; min-height: 160px" />
+</div>
+<hgroup>
+  <h1><a href="/">Arnab Chakraborty</a></h1>
+</hgroup>
+
+<p class="subtitle">A cognitive perspective on web.</p>
+<nav id="main-nav"><ul class="main-navigation clearfix">
+  <li>
+    <a href="/">Home</a></li>
+  <li>
+    <a href="/blog/archives">Archives</a></li>
+  <li>
+    <a href="/about">About</a>
+  </li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+    
+		
+    
+		
+		<a class="twitter" href="http://twitter.com/arnabc" title="Twitter">
+		  <i class="icon-twitter"></i>
+		</a>
+		
+    
+		
+		<a class="github" href="https://github.com/arnabc" title="GitHub">
+      <i class="icon-github"></i>
+    </a>
+		
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/webgyani">
+		  <i class="icon-linkedin"></i>
+		</a>
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS"><i class="icon-rss"></i></a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+  	<h1 class="title" itemprop="name">PhoneGap - How Does It Work</h1>
+  </header>
+	<div class="entry-content" itemprop="articleBody"><p>PhoneGap is an open-source cross-platform Mobile Application development framework by Nitobi Software (now Adobe) which allows web developers to build mobile apps using HTML, CSS and JavaScript.</p>
+
+<p>The PhoneGap project has been moved to Apache Incubator and now it is known as &ldquo;Apache Callback&rdquo;. PhoneGap project is divided into several sub-projects where each one represents a separate platform. In order to develop for iPhone and iPad, you need Mac OSX and XCode installed, similarly for Android you need Google Android SDK, Eclipse ADT Plugin, Ant as well as Eclipse IDE.</p>
+
+<p>The official project detail can be found here <a href="http://cordova.apache.org/" title="Apache Cordova/PhoneGap">Apache Cordova</a>. <del>It is currently hosted in GitHub and once the Apache infrastructure is ready it will be moved there.</del></p>
+
+<!--more-->
+
+
+<h2>Supported Platforms</h2>
+
+<p>PhoneGap supports several mobile platforms, which enables web developers to write code using their existing HTML/JS skills and deploy to multiple platforms:</p>
+
+<ul>
+<li>iOS (iPhone/iPad)</li>
+<li>Android</li>
+<li>Symbian</li>
+<li>BlackBerry</li>
+<li>WebOS (most likely dead &ndash; go blame HP)</li>
+<li>WP7</li>
+<li>Samsung Bada</li>
+</ul>
+
+
+<p>The environment setup for each of the above mentioned platforms can be found in <a href="http://phonegap.com/start/" title="Getting Started with PhoneGap">&ldquo;Getting Started&rdquo;</a>.</p>
+
+<h2>Architecture</h2>
+
+<p>PhoneGap is not a &ldquo;native application development&rdquo; framework, even though it provides access through several device features using an abstraction layer, which otherwise are inaccessible to a normal webpage. In simple words, it provies a &ldquo;WebView&rdquo; with extended capabilities. Using PhoneGap one can access the following device features:</p>
+
+<ul>
+<li>Camera</li>
+<li>Geolocation</li>
+<li>Compass</li>
+<li>Contacts</li>
+<li>Media</li>
+<li>Accelerometer</li>
+<li>Network</li>
+<li>Notification</li>
+<li>Storage</li>
+<li>Filesystem</li>
+<li>etc&hellip;</li>
+</ul>
+
+
+<p>The following diagram explains how does a PhoneGap architecture look like:</p>
+
+<p><img src="/images/phonegap-architecture.jpg" alt="PhoneGap Architecture" /></p>
+
+<p>In the above dialogram we can see that PhoneGap provides a &ldquo;WebView&rdquo; which is nothing but a bare bone web browser without a Chrome UI. The native code in PhoneGap SDK exposes uniform APIs across multiple device platforms which are accessible to JavaScript running inside the WebView.</p>
+
+<p>As a web developer if you are using PhoneGap then it&rsquo;s less likely that you&rsquo;ll need to know the internals of the SDK (although it is always recommended to go through the source code in case you want to enlighten yourself as well as get fascinated by the tremendous efforts that the PhoneGap developers have put into it)</p>
+
+<h2>How to approach PhoneGap development</h2>
+
+<p>Even though you&rsquo;re using HTML/CSS and JavaScript to develop applications, remember that it&rsquo;s not a traditional desktop browser environment and the user experience pattern is significantly different. The PhoneGap apps are downloadable from App Store, so user might not know(or they don&rsquo;t even care) that your app is built using PhoneGap or HTML/CSS, it&rsquo;s always a good practice to be consistent with the platform UI guidelines so that you don&rsquo;t confuse your users. A simple example could be if you&rsquo;re developing a PhoneGap app for Android then be sure to handle the hardware/software(ICS) &ldquo;back key&rdquo;, if you don&rsquo;t do that then your users might get confused.</p>
+
+<p>Another important factor is handling scaling and device orientation, you should always make sure that your app looks proper in both Portrait and Landscape orientations.</p>
+
+<p>The recommended way to start PhoneGap development is below:</p>
+
+<ul>
+<li>Setup environment for the target platform for example iOS/Android etc, see <a href="http://phonegap.com/start/">Getting Started</a>.</li>
+<li>Run the sample app provided with the PhoneGap SDK.</li>
+<li>Go though the <a href="http://docs.phonegap.com/" title="PhoneGap API Documentation">API Documentation</a>.</li>
+<li>Try creating sample apps of your own using each of the device features available through the PhoneGap API.</li>
+<li>Once you are familiar with PhoneGap, try creating a sample app which uses multiple device APIs, you can try using jQuery Mobile, Sencha, Jo HTML5 Mobile App or jQTouch) to build the Phone like user interface.</li>
+</ul>
+
+
+<h2>Limitations</h2>
+
+<p>PhoneGap as development platform is very attractive and promises to bring uniformity across several mobile platforms. It aims to become a de facto mobile application development framework using HTML5 based technologies. But as said above the capabilities offered by the framework is limited to what a &ldquo;WebView&rdquo; can do. The following are a list of things to watch out for:</p>
+
+<ul>
+<li>In iOS the WebView is not JIT enabled (however the actual iPhone browser is), which means the JS code can&rsquo;t take advantage of the engine optimizations which are otherwise available to actual browser of the device.</li>
+<li>In Android the CSS rendering in WebView is not as par with iOS, the rounded corners often look jagged.</li>
+<li>The WebView runs with limited amount of memory, be sure to optimize your JS code so that it doesn&rsquo;t cause trouble.</li>
+<li>If you are developing for multiple platforms, make sure that you&rsquo;re aware of the capabilities available in that platform, for example &ndash; in latest iOS you can use WebSocket but in Android it&rsquo;s not yet available (not confirmed in ICS though).</li>
+<li>PhoneGap has good support from BlackBerry 6.0+ (with WebWorks SDK), phones with older BlackBerry versions may not work as expected.</li>
+</ul>
+
+
+<h2>Security</h2>
+
+<p>As your app runs inside WebView (aka a browser), you should not allow untrusted third-party code to execute in the page, because this can compromize the security, the JS code downloaded from internet will suddenly have access to several device features that they can make substantial damage to user&rsquo;s privacy and security. Do not load an iFrame in your app, or redirect to some other websites when the app is loaded, as this will likely get your app rejected in Apple app store, beacuse Apple does not like applications opening public websites inside the app as it makes it difficult or almost impossible to enforce policies regarding content.</p>
+
+<h2>Resources</h2>
+
+<p>The following resouces can be useful for HTML5 based mobile apps development (not all are related to PhoneGap):</p>
+
+<ul>
+<li><a href="http://jquerymobile.com">jQuery Mobile</a></li>
+<li><a href="http://joapp.com">Jo HTML5 App Framework</a></li>
+<li><a href="www.sencha.com/products/touch">Sencha Touch &ndash; Commercial</a></li>
+<li><a href="http://jqtouch.com">jQTouch</a></li>
+<li><a href="http://appmobi.com">AppMobi</a></li>
+<li><a href="http://dhtmlx.com/touch/">DHTMLX Touch</a></li>
+<li><a href="http://www.nimblekit.com/">NimbleKit &ndash; iOS only Commercial</a></li>
+<li><a href="http://www.the-m-project.org/">The M-Project</a></li>
+<li><a href="http://www.winktoolkit.org/">Wink Toolkit</a></li>
+<li><a href="http://zeptojs.com">Zepto.js &ndash; JavaScript library for Webkit browsers</a></li>
+<li><a href="http://documentcloud.github.com/backbone/">Backbone.JS &ndash; JavaScript MVC framework</a></li>
+</ul>
+
+
+<h2>Conclusion</h2>
+
+<p>PhoneGap provides an opportunity to a vast pool of web developers reusing their existing skills to develop applications for mobile phones, which in future is going to be one of the most important medium to access information and content in internet. As the phones become more powerful, the new capabilities will be available in your arsenal. The recent developments in HTML5 based technologies also usher a new change in this segment. Do not miss the bus and keep exploring PhoneGap.</p>
+</div>
+
+</article>
+
+	
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2013 - Arnab Chakraborty -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+			<script src="/javascripts/slash.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'arnabc';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://arnab.ch/blog/2011/12/phonegap-how-does-it-work/';
+        var disqus_url = 'http://arnab.ch/blog/2011/12/phonegap-how-does-it-work/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-28528371-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>
