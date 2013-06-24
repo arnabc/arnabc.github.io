@@ -1,0 +1,14 @@
+---
+layout: default
+title: Blog Archives
+---
+
+<div itemscope itemtype="http://schema.org/Blog" class="blog-archives">
+  <header>
+    <h1>Archives</h1>
+  </header>
+{% for post in site.posts reverse %}
+	{% include archive_post.html %}
+{% endfor %}
+  </section>
+</div>
