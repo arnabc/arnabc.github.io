@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://arnab.ch/blog/2011/12/phonegap-how-does-it-work/</loc>
+        <lastmod>2013-06-24T15:41:27+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/</loc>
+        <lastmod>2013-06-24T18:20:04+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/</loc>
+        <lastmod>2013-06-24T15:35:36+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/about/</loc>
+        <lastmod>2013-06-24T18:25:57+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/blog/archives/</loc>
+        <lastmod>2013-06-24T18:20:04+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/</loc>
+        <lastmod>2013-06-24T18:20:04+05:30</lastmod>
+    </url>
+    <url>
+        <loc>http://arnab.ch/robots.txt</loc>
+        <lastmod>2013-05-21T19:23:07+05:30</lastmod>
+    </url>
+</urlset>

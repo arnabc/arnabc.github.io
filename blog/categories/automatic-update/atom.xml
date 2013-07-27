@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Automatic update | Arnab Chakraborty]]></title>
+  <link href="http://arnab.ch/blog/categories/automatic-update/atom.xml" rel="self"/>
+  <link href="http://arnab.ch/"/>
+  <updated>2013-06-24T18:47:55+05:30</updated>
+  <id>http://arnab.ch/</id>
+  <author>
+    <name><![CDATA[Arnab Chakraborty]]></name>
+    <email><![CDATA[arnabc@webgyani.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
+    <link href="http://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/"/>
+    <updated>2012-01-21T00:26:00+05:30</updated>
+    <id>http://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application</id>
+    <content type="html"><![CDATA[<p>Well, the title of the post may not be descriptive enough of the complexity that we dealt with in one of our recent projects. Before I delve deeper into the actual problem, let me give you some background of what we&rsquo;re trying to achieve. We&rsquo;ve been working on an Android application for some time which is going to be installed in kiosks or in cabs mainly on Android tablets (currently Android 2.2 devices), basically this is a sort of in-cab entertainment system where you can listen to music, watch videos, latest movie trailers and promos, read latest news, search places and find them in maps. You may think what&rsquo;s so complicated about it? Well this app is an Android Homescreen application and this is going to be the only application that users can access from the tablets and above all it&rsquo;ll be <strong>remotely managed</strong>.</p>
+
+<p>The term <strong>remotely managed</strong> means that the app will be automatically updated over the air, there will be a provisioning server where the admins can publish/upload a new build, and that build will automatically be installed in the devices. Other than that the device can also be remotely restarted or shut down. The content that users can access or play using the app is stored in the device for faster access, and that content is synced (i.e. updated) periodically from a remote content syncing server. All of these are happening over the internet and the devices are equipped with a 3G chip, which makes it easier to download large amount of data with a decent network speed, else the content syncing would be a real pain. Below is the list of rough requirements that we had:</p>
+
+<ul>
+<li>The main app will be the only app which users can access.</li>
+<li>Automatic update over the air using a provisioning server.</li>
+<li>Sync content from a remote content syncing server.</li>
+<li>Report Crashes and device health statuses to the server.</li>
+</ul>
+
+
+<!--more-->
+
+
+<p>If you look at the requirements above, this ain&rsquo;t an easy task and sure it&rsquo;s not, we&rsquo;re developing the app since last few months and are close to completion, the app is currently being field tested and hopefully it&rsquo;ll soon be live out there in the wild.</p>
+
+<p>So the big question is what are the challenges that we faced while we pulled off this effort, the purpose of this blog post is to share some of the findings/knowledge that we&rsquo;ve gained over the period of time while developing the app. The ways that we&rsquo;ve adopted are not the ones which can be adopted if you&rsquo;re going to have your app be distributed through the Android market, our app isn&rsquo;t or will not be distributed from the Android market, this is a custom application developed for a very specific/limited set of devices in mind. I&rsquo;ll cover each of the requirements mentioned above and will share some of the rough design choices that we made in order to meet the requirements.</p>
+
+<h2>The main app will be the only app which users can access</h2>
+
+<p>There&rsquo;s only one way that you can have this kind of application in Android, make your app a homescreen app, so that whenever users press home/back button they&rsquo;ll land up right there in your app, and they can&rsquo;t get out of it (provided your app is the default one). In order to prevent users from exiting your app, you may need to handle some other stuff like options menu, disable recent items, and may be some extra buttons (some Chinese devices come with extra buttons on 7&Prime; Android tablets) etc. These extra keys can be handled/prevented using Android key handling code.</p>
+
+<h2>Automatic update over the air using a provisioning server</h2>
+
+<p>This is an interesting part, you may be aware of that in Android the automatic update of an app can only happen through Marketplace, there&rsquo;s no other way to update an app. But our app is not going to be distributed through Marketplace, so how do we update then? Well there&rsquo;s no easy way to do it, and the process is complicated.</p>
+
+<p>First of all, in Android in order to <em>silently install</em> an app, you need special permission called INSTALL_PACKAGES which is a <em>system permission</em> and IS NOT available to apps <em>not signed</em> with system/firmware certificate. This is an issue that we need to get past in order to make it happen, after few days of searching and testing several options, I narrowed it down to the following options:</p>
+
+<ol>
+<li><strong>Sign the app with the system certificate</strong> &ndash; This was not possible because we couldn&rsquo;t procure the certificate from the hardware vendor of our choice.</li>
+<li><strong>Install our own Android custom ROM with the app bundled</strong> &ndash; This was possible, but it requires more engineering effort as well as taking care of device drivers that manufacturers ship with the device. Other than that there&rsquo;s a maintenance effort involved in future where we have to ensure that our custom Android ROM works with at least two to three different devices. So, this too was not a viable solution for us.</li>
+<li><strong>Root the device and install the package through code</strong> &ndash; This was the last option that I tried and IT WORKED!, after couple of iterations on rooting procedure, I managed to root the device properly.</li>
+</ol>
+
+
+<p>At first I tried the <strong>rageagainstthecage</strong> exploit to root, but it were only able to temporarily root the device and it wouldn&rsquo;t survive a reboot. Then I used <strong>psneuter</strong> to root the device and installed <strong>busybox</strong> and the modified <strong>su</strong> binary provided by the excellent guys from <a href="http://shortfuse.org/"><strong>SuperOneClick</strong></a> installer. Along with that I also installed the <a href="https://market.android.com/details?id=com.noshufou.android.su&amp;hl=en">Superuser</a> app to manage the <em>su</em> permissions. Once the rooting procedure is in place it&rsquo;s time to move on to code and write an Android service which can automatically install our application.</p>
+
+<h3>Updater Service</h3>
+
+<p>This service is the crux of this application, it acts as a &ldquo;remote control&rdquo; to manage the device as well as our homescreen application. We decided to build it as a separate app not part of the homescreen application, because this app is not going to have any GUI. So how does this work? Below is the rough diagram of it&rsquo;s architecture:</p>
+
+<p><img src="/images/updater-service-sequence-diagram.png" alt="Updater Service Sequence Diagram" /></p>
+
+<p>In the above diagram, our Updater app is started whenever the device is rebooted (as per our installation process, we reboot the device after installing the update service app), it sets up a repeating alarm using a <em>PendingIntent</em>, which is invoked after a certain period of time, in the mean time it also makes a quick request to the provisioning server for any available update. If there&rsquo;s an update then the UpdateService downloads the APK (link provided in the update check response) and once it&rsquo;s downloaded (stored in the SDcard) it then fires up an intent to start the PackageInstaller and gives the APK file path as part of the intent payload. The PackageInstaller then runs the <code>pm install -r &lt;apkPath&gt;</code> command with <code>su</code> privilege. In order to execute the commands as <em>root</em> I used a modified version of the <a href="http://muzikant-android.blogspot.com/2011/02/how-to-get-root-access-and-execute.html">excellent piece of code available from here</a>. Once the installation process is complete we notify the backend server that the device has been updated with the latest app (by the way it may already be clear to you that the provisioning server has the list of devices running in the wild and knows which device is running what version of the app). Anyway, this cycle of checking for updates continues as every time the alarm fires or the device is rebooted.</p>
+
+<p>Although the entire procedure went smoothly, it wasn&rsquo;t without a hitch, as I mentioned that our app is a homescreen application and in Android when you have multiple homescreen apps, every time you click on the home button you&rsquo;re presented with a list of homescreen apps to choose from. So in our case we have two homescreen apps one is the default Android <strong>Launcher</strong> and the other is our homescreen app, as part of the installation procedure we set that app up to be the default one. But after update that settings was getting reset and pressing on the home button again was displaying that list of homescreen apps to choose from. We tried to solve this through code by setting our own <code>Activity</code> as the default homescreen app using the Android API <code>addPreferredActivty()</code> but that didn&rsquo;t work because it has been removed/disabled by Google from Android 2.2 Froyo onwards (it was available till 2.1), the device that we&rsquo;re using has the Android version 2.2.2. This was almost a dead end and that time we came up with a <strong>very interesting</strong> hack, and the trick is very simple <strong>just rename the launcher APK</strong>, ya that&rsquo;s it just rename it and it&rsquo;s gone :&ndash;). So here&rsquo;s the steps that we have:</p>
+
+<h4>Before Install Steps</h4>
+
+<ol>
+<li>Mount the <code>/system</code> folder as RW volume using <code>busybox</code>, by default it&rsquo;s readonly.</li>
+<li>Restore(rename) the original lancher apk back to &ldquo;Launcher.apk&rdquo;</li>
+<li>Unmount the <code>/system</code> back to it&rsquo;s original ReadOnly mode.</li>
+</ol>
+
+
+<p>Example commands:
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example commands </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>busybox mount -o rw,remount /system
+</span><span class='line'><span class="nv">$ </span>mv /system/app/Launcher.tmp.apk /system/app/Launcher.apk
+</span><span class='line'><span class="nv">$ </span>busybox mount -o ro,remount /system
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h4>After Install Steps</h4>
+
+<ol>
+<li>Mount the <code>/system</code> folder as RW volume using <code>busybox</code>, by default it&rsquo;s readonly.</li>
+<li>Rename the original &ldquo;Launcher.apk&rdquo; to &ldquo;Launcher.tmp.apk&rdquo;</li>
+<li>Unmount the <code>/system</code> back to it&rsquo;s original ReadOnly mode.</li>
+</ol>
+
+
+<p>Example commands:
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example commands </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>busybox mount -o rw,remount /system
+</span><span class='line'><span class="nv">$ </span>mv /system/app/Launcher.apk /system/app/Launcher.tmp.apk
+</span><span class='line'><span class="nv">$ </span>busybox mount -o ro,remount /system
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Note: In some devices the Launcher apk may be named as Launcher2.apk.</p>
+
+<h2>Sync content from a remote content syncing server</h2>
+
+<p>Similarly to the update service above, the Content Syncing part is also a separate app without a GUI, it gets started on RECEIVE_BOOT_COMPLETED intent and checks for updated content once a day. We download a pretty large amount of data which can range anywhere from 100MB-1GB. Below is the sequence diagram of the rough architecture that we have:</p>
+
+<p><img src="/images/content-sync-sequence-diagram.png" alt="Content Sync Sequence Diagram" /></p>
+
+<p>Once the download sync is complete, the app sends an Intent notifying the Main homescreen application about the content update so that it can display a friendly message to the user in case the device content is being used/played at that time. The main app stores some of the data in memory or in a SQLite database when it starts, so in order to cleanly rebuild that entire data structure we&rsquo;re currently rebooting the device. But in future <em>we&rsquo;re planning to avoid it, so that the content update does not need a reboot</em>.</p>
+
+<h2>Conclusion</h2>
+
+<p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
+
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#98;&#x69;&#x7a;&#x40;&#113;&#117;&#x61;&#100;&#x6e;&#111;&#100;&#x65;&#46;&#x63;&#111;&#x6d;">&#x62;&#105;&#122;&#x40;&#113;&#x75;&#97;&#100;&#110;&#111;&#x64;&#x65;&#x2e;&#99;&#x6f;&#109;</a>, we&rsquo;d be happy to help you.</p>
+
+<p>Thanks for reading!</p>
+]]></content>
+  </entry>
+  
+</feed>
