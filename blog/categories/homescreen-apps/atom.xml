@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Homescreen Apps | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/homescreen-apps/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-06-24T18:47:55+05:30</updated>
+  <updated>2013-08-16T14:36:44+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -12,6 +12,688 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
+    <link href="http://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
+    <updated>2013-08-16T14:54:00+05:30</updated>
+    <id>http://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
+    <content type="html"><![CDATA[<p>In Android the screen that appears when the phone starts is called &ldquo;Launcher Screen&rdquo;. It is possible in Android to write custom launcher apps which can be used as a replacement for the default launcher app that comes bundled with the phone. Developing a launcher app is no different than developing any other Android application, in fact both are same. In this post I&rsquo;ll share what you need to do to write your own custom launcher application.</p>
+
+<!-- more -->
+
+
+<h2>AndroidManifest.xml</h2>
+
+<p>I&rsquo;ll skip the part of creating the project and drive straight to the code. Here is our sample <code>AndroidManifest.xml</code> file, remember to pay attention to the comments in the code.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AndroidManifest.xml </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span><span class="ni">&amp;lt;</span>?xml version=<span class="ni">&amp;ldquo;</span>1.0<span class="ni">&amp;rdquo;</span> encoding=<span class="ni">&amp;ldquo;</span>utf-8<span class="ni">&amp;rdquo;</span>?&gt;
+</span><span class='line'><span class="ni">&amp;lt;</span>manifest xmlns:android=<span class="ni">&amp;ldquo;</span><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>http://schemas.android.com/apk/res/android<span class="nt">&lt;/a&gt;</span><span class="ni">&amp;rdquo;</span><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;pre&gt;&lt;code&gt;</span>package=&quot;ch.arnab.simplelauncher&quot;
+</span><span class='line'>android:versionCode=&quot;1&quot;
+</span><span class='line'>android:versionName=&quot;1.0&quot; <span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>uses-sdk
+</span><span class='line'>    android:minSdkVersion=&quot;8&quot;
+</span><span class='line'>    android:targetSdkVersion=&quot;16&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>application
+</span><span class='line'>    android:launchMode=&quot;singleTask&quot;
+</span><span class='line'>    android:clearTaskOnLaunch=&quot;true&quot;
+</span><span class='line'>    android:stateNotNeeded=&quot;true&quot;
+</span><span class='line'>    android:icon=&quot;@drawable/ic_launcher&quot;
+</span><span class='line'>    android:label=&quot;@string/app_name&quot;
+</span><span class='line'>    android:theme=&quot;@style/AppTheme&quot; <span class="ni">&amp;gt;</span>
+</span><span class='line'>    <span class="ni">&amp;lt;</span>activity
+</span><span class='line'>        android:name=&quot;ch.arnab.simplelauncher.HomeScreen&quot;
+</span><span class='line'>        android:label=&quot;@string/app_name&quot;
+</span><span class='line'>        android:launchMode=&quot;singleTask&quot;
+</span><span class='line'>        android:excludeFromRecents=&quot;true&quot;
+</span><span class='line'>        android:screenOrientation=&quot;nosensor&quot;<span class="ni">&amp;gt;</span>
+</span><span class='line'>        <span class="ni">&amp;lt;</span>intent-filter<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>action android:name=&quot;android.intent.action.MAIN&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>!-- The following two intent-filters are the key to set homescreen --<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>category android:name=&quot;android.intent.category.HOME&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>category android:name=&quot;android.intent.category.DEFAULT&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="ni">&amp;lt;</span>/intent-filter<span class="ni">&amp;gt;</span>
+</span><span class='line'>    <span class="ni">&amp;lt;</span>/activity<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="ni">&amp;lt;</span>/application<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="nt">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;/manifest&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The important line in the above <em>XML</em> file is <code>&lt;category android:name="android.intent.category.HOME" /&gt;</code>, this <code>intent-filter</code> allows you to set your application as <strong>Home Screen</strong> application. Android looks for this particular intent filter and whenever you install your app with this intent-filter set then your application will appear in the list of installed launchers (a tap on the Home button will reveal the list).</p>
+
+<h2>Display installed applications in our custom homescreen</h2>
+
+<p>Now as we have finished with the manifest file, let&rsquo;s add some code to display the list of installed applications in our Home Screen, this way we can at least use the app after installing.</p>
+
+<h3>AsyncTaskLoader to asynchronously load applications</h3>
+
+<p>Here is the code to load the applications list asynchronously, we&rsquo;re using a custom AsyncTaskLoader class, later we&rsquo;ll hook it up in our fragment class using the Android Loaders.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppsLoader.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppsLoader</span> <span class="kd">extends</span> <span class="n">AsyncTaskLoader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">mInstalledApps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">final</span> <span class="n">PackageManager</span> <span class="n">mPm</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="nf">AppsLoader</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mPm</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getPackageManager</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loadInBackground</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// retrieve the list of installed applications</span>
+</span><span class='line'>    <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ApplicationInfo</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span> <span class="o">=</span> <span class="n">mPm</span><span class="o">.</span><span class="na">getInstalledApplications</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">apps</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">apps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ApplicationInfo</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">final</span> <span class="n">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getContext</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// create corresponding apps and load their labels</span>
+</span><span class='line'>    <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">items</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;(</span><span class="n">apps</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">apps</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">String</span> <span class="n">pkg</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">packageName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// only apps which are launchable</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getPackageManager</span><span class="o">().</span><span class="na">getLaunchIntentForPackage</span><span class="o">(</span><span class="n">pkg</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">AppModel</span> <span class="n">app</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AppModel</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">apps</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+</span><span class='line'>            <span class="n">app</span><span class="o">.</span><span class="na">loadLabel</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">items</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">app</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// sort the list</span>
+</span><span class='line'>    <span class="n">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">items</span><span class="o">,</span> <span class="n">ALPHA_COMPARATOR</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">items</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">deliverResult</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isReset</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// An async query came in while the loader is stopped.  We</span>
+</span><span class='line'>        <span class="c1">// don&#39;t need the result.</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">apps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">oldApps</span> <span class="o">=</span> <span class="n">apps</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">mInstalledApps</span> <span class="o">=</span> <span class="n">apps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isStarted</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If the Loader is currently started, we can immediately</span>
+</span><span class='line'>        <span class="c1">// deliver its results.</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">deliverResult</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with</span>
+</span><span class='line'>    <span class="c1">// &#39;oldApps&#39; if needed; now that the new result is delivered we</span>
+</span><span class='line'>    <span class="c1">// know that it is no longer in use.</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">oldApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">oldApps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStartLoading</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mInstalledApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If we currently have a result available, deliver it</span>
+</span><span class='line'>        <span class="c1">// immediately.</span>
+</span><span class='line'>        <span class="n">deliverResult</span><span class="o">(</span><span class="n">mInstalledApps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">takeContentChanged</span><span class="o">()</span> <span class="o">||</span> <span class="n">mInstalledApps</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If the data has changed since the last time it was loaded</span>
+</span><span class='line'>        <span class="c1">// or is not currently available, start a load.</span>
+</span><span class='line'>        <span class="n">forceLoad</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStopLoading</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Attempt to cancel the current load task if possible.</span>
+</span><span class='line'>    <span class="n">cancelLoad</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCanceled</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">onCanceled</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with &#39;apps&#39;</span>
+</span><span class='line'>    <span class="c1">// if needed.</span>
+</span><span class='line'>    <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onReset</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Ensure the loader is stopped</span>
+</span><span class='line'>    <span class="n">onStopLoading</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with &#39;apps&#39;</span>
+</span><span class='line'>    <span class="c1">// if needed.</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mInstalledApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">mInstalledApps</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">mInstalledApps</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Helper method to do the cleanup work if needed, for example if we&#39;re</span>
+</span><span class='line'><span class="cm"> * using Cursor, then we should be closing it here</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * @param apps</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onReleaseResources</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// do nothing</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Perform alphabetical comparison of application entry objects.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Comparator</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">ALPHA_COMPARATOR</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comparator</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Collator</span> <span class="n">sCollator</span> <span class="o">=</span> <span class="n">Collator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">AppModel</span> <span class="n">object1</span><span class="o">,</span> <span class="n">AppModel</span> <span class="n">object2</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sCollator</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">object1</span><span class="o">.</span><span class="na">getLabel</span><span class="o">(),</span> <span class="n">object2</span><span class="o">.</span><span class="na">getLabel</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">};</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The loader class above will only retrieve the applications for which a &ldquo;good&rdquo; launch intent is available, put simply we&rsquo;re only displaying those applications for which <code>getLaunchIntentForPackage</code> returns a valid launch intent.</p>
+
+<h3>GridView Adapter</h3>
+
+<p>A simple adapter used to populate the applications' icons and names in a <code>GridView</code>.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppListAdapter.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppListAdapter</span> <span class="kd">extends</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">final</span> <span class="n">LayoutInflater</span> <span class="n">mInflater</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="nf">AppListAdapter</span> <span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">simple_list_item_2</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mInflater</span> <span class="o">=</span> <span class="n">LayoutInflater</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setData</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">clear</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">data</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">addAll</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="nd">@TargetApi</span><span class="o">(</span><span class="n">Build</span><span class="o">.</span><span class="na">VERSION_CODES</span><span class="o">.</span><span class="na">HONEYCOMB</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addAll</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">items</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">//If the platform supports it, use addAll, otherwise add in loop</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">Build</span><span class="o">.</span><span class="na">VERSION</span><span class="o">.</span><span class="na">SDK_INT</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">Build</span><span class="o">.</span><span class="na">VERSION_CODES</span><span class="o">.</span><span class="na">HONEYCOMB</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span><span class="k">else</span><span class="o">{</span>
+</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="n">AppModel</span> <span class="nl">item:</span> <span class="n">items</span><span class="o">){</span>
+</span><span class='line'>            <span class="kd">super</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Populate new items in the list.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="nd">@Override</span> <span class="kd">public</span> <span class="n">View</span> <span class="n">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">View</span> <span class="n">view</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">convertView</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">view</span> <span class="o">=</span> <span class="n">mInflater</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">list_item_icon_text</span><span class="o">,</span> <span class="n">parent</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">view</span> <span class="o">=</span> <span class="n">convertView</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">AppModel</span> <span class="n">item</span> <span class="o">=</span> <span class="n">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">((</span><span class="n">ImageView</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">icon</span><span class="o">)).</span><span class="na">setImageDrawable</span><span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getIcon</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">((</span><span class="n">TextView</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">text</span><span class="o">)).</span><span class="na">setText</span><span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getLabel</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h3>Grid Fragment</h3>
+
+<p>Grid view container fragment class, uses Android Loaders to load the list of applications and displays them in the Grid view.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppsGridFragment.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppsGridFragment</span> <span class="kd">extends</span> <span class="n">GridFragment</span> <span class="kd">implements</span> <span class="n">LoaderManager</span><span class="o">.</span><span class="na">LoaderCallbacks</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">AppListAdapter</span> <span class="n">mAdapter</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityCreated</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">onActivityCreated</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">setEmptyText</span><span class="o">(</span><span class="s">&quot;No Applications&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AppListAdapter</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">setGridAdapter</span><span class="o">(</span><span class="n">mAdapter</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// till the data is loaded display a spinner</span>
+</span><span class='line'>    <span class="n">setGridShown</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// create the loader to load the apps list in background</span>
+</span><span class='line'>    <span class="n">getLoaderManager</span><span class="o">().</span><span class="na">initLoader</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">onCreateLoader</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="nf">AppsLoader</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLoadFinished</span><span class="o">(</span><span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loader</span><span class="o">,</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mAdapter</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isResumed</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">setGridShown</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">setGridShownNoAnimation</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLoaderReset</span><span class="o">(</span><span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loader</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mAdapter</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onGridItemClick</span><span class="o">(</span><span class="n">GridView</span> <span class="n">g</span><span class="o">,</span> <span class="n">View</span> <span class="n">v</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">AppModel</span> <span class="n">app</span> <span class="o">=</span> <span class="o">(</span><span class="n">AppModel</span><span class="o">)</span> <span class="n">getGridAdapter</span><span class="o">().</span><span class="na">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">app</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getActivity</span><span class="o">().</span><span class="na">getPackageManager</span><span class="o">().</span><span class="na">getLaunchIntentForPackage</span><span class="o">(</span><span class="n">app</span><span class="o">.</span><span class="na">getApplicationPackageName</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">intent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h3>Layout file</h3>
+
+<p>A simple layout file to embed the grid fragment.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>homescreen.xml </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="ni">&amp;lt;</span>RelativeLayout xmlns:android=<span class="ni">&amp;ldquo;</span><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>http://schemas.android.com/apk/res/android<span class="nt">&lt;/a&gt;</span><span class="ni">&amp;rdquo;</span><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;pre&gt;&lt;code&gt;</span>xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+</span><span class='line'>android:layout_width=&quot;match_parent&quot;
+</span><span class='line'>android:layout_height=&quot;match_parent&quot;
+</span><span class='line'>android:paddingLeft=&quot;@dimen/activity_horizontal_margin&quot;
+</span><span class='line'>android:paddingRight=&quot;@dimen/activity_horizontal_margin&quot;
+</span><span class='line'>android:paddingTop=&quot;@dimen/activity_vertical_margin&quot;
+</span><span class='line'>android:paddingBottom=&quot;@dimen/activity_vertical_margin&quot;
+</span><span class='line'>tools:context=&quot;.HomeScreen&quot;<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>fragment
+</span><span class='line'>        android:layout_width=&quot;match_parent&quot;
+</span><span class='line'>        android:layout_height=&quot;match_parent&quot;
+</span><span class='line'>        android:name=&quot;ch.arnab.simplelauncher.AppsGridFragment&quot;
+</span><span class='line'>        android:id=&quot;@+id/apps_grid&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="nt">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;/RelativeLayout&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h2>Running the homescreen application</h2>
+
+<p>As it&rsquo;s a Launcher app, so when you install it you don&rsquo;t get to see anything unless you tap on the home button. The tap on the Home button  shows you a chooser dialog from which you can select the appropriate Launcher app.</p>
+
+<p>That&rsquo;s it, you now have your own custom launcher application. Although a full-fledged launcher app like the ones that come with Android phones has many features built into them, but you can use this as a basic building block and start writing a more advanced and complex launcher as you learn.</p>
+
+<p>For those who wants to investigate further, do take a look at the default launcher application code here: <a href="https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/">Android Stock Launcher App</a></p>
+
+<p>You can download the full source code used in this article from this Github <a href="https://github.com/arnabc/simplelauncher/zipball/master">repository</a>.</p>
+
+<div class="github-widget" data-repo="arnabc/simplelauncher"></div>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
@@ -118,7 +800,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x62;&#x69;&#122;&#64;&#x71;&#x75;&#97;&#100;&#x6e;&#x6f;&#100;&#101;&#x2e;&#x63;&#x6f;&#x6d;">&#x62;&#x69;&#122;&#64;&#x71;&#117;&#x61;&#x64;&#x6e;&#x6f;&#100;&#x65;&#x2e;&#x63;&#111;&#109;</a>, we&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#98;&#105;&#x7a;&#64;&#x71;&#x75;&#x61;&#100;&#x6e;&#111;&#x64;&#101;&#46;&#99;&#x6f;&#x6d;">&#x62;&#x69;&#122;&#64;&#113;&#x75;&#x61;&#x64;&#110;&#111;&#x64;&#x65;&#x2e;&#x63;&#111;&#x6d;</a>, we&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>
