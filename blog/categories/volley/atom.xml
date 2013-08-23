@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Volley | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/volley/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-08-23T16:04:00+05:30</updated>
+  <updated>2013-08-23T16:07:42+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -832,7 +832,7 @@
 </span><span class='line'><span class="cm"> * @return</span>
 </span><span class='line'><span class="cm"> */</span>
 </span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isNetworkProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NetworkError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'><span class="cm">/**</span>
 </span><span class='line'><span class="cm"> * Determines whether the error is related to server</span>

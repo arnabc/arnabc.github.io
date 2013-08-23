@@ -843,7 +843,7 @@
 </span><span class='line'><span class="cm">  * @return</span>
 </span><span class='line'><span class="cm">  */</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isNetworkProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NetworkError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'>  <span class="cm">/**</span>
 </span><span class='line'><span class="cm">  * Determines whether the error is related to server</span>
