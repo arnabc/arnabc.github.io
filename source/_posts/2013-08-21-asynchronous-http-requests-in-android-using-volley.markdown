@@ -448,7 +448,7 @@ public class VolleyErrorHelper {
 	 * @return
 	 */
 	private static boolean isNetworkProblem(Object error) {
-	    return (error instanceof NoConnectionError) || (error instanceof NoConnectionError);
+	    return (error instanceof NetworkError) || (error instanceof NoConnectionError);
 	}
 	/**
 	 * Determines whether the error is related to server
