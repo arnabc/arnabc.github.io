@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Volley | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/volley/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-08-23T10:26:06+05:30</updated>
+  <updated>2013-08-23T16:04:00+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -713,7 +713,7 @@
 <li><strong>NoConnectionError</strong> &mdash; Similar to NetworkError, but fires when device does not have internet connection, your error handling logic can club <code>NetworkError</code> and <code>NoConnectionError</code> together and treat them similarly.</li>
 <li><strong>ParseError</strong> &mdash; While using <code>JsonObjectRequest</code> or <code>JsonArrayRequest</code> if the received JSON is malformed then this exception will be generated. If you get this error then it is a problem that should be fixed instead of being handled.</li>
 <li><strong>ServerError</strong> &mdash; The server responded with an error, most likely with <em>4xx</em> or <em>5xx</em> HTTP status codes.</li>
-<li><strong>TimeoutError</strong> &mdash; Socket timeout, either server is too busy to handle the request or their is some network latency issue. By default Volley times out the request after <strong>2.5 seconds</strong>, use a RetryPolicy if you are consistently getting this error.</li>
+<li><strong>TimeoutError</strong> &mdash; Socket timeout, either server is too busy to handle the request or there is some network latency issue. By default Volley times out the request after <strong>2.5 seconds</strong>, use a RetryPolicy if you are consistently getting this error.</li>
 </ul>
 
 
