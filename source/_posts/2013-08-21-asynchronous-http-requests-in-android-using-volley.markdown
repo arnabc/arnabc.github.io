@@ -414,7 +414,7 @@ The following is the list of exceptions in Volley:
 * **NoConnectionError** -- Similar to NetworkError, but fires when device does not have internet connection, your error handling logic can club ```NetworkError``` and ```NoConnectionError``` together and treat them similarly.
 * **ParseError** -- While using ```JsonObjectRequest``` or ```JsonArrayRequest``` if the received JSON is malformed then this exception will be generated. If you get this error then it is a problem that should be fixed instead of being handled.
 * **ServerError** -- The server responded with an error, most likely with _4xx_ or _5xx_ HTTP status codes.
-* **TimeoutError** -- Socket timeout, either server is too busy to handle the request or their is some network latency issue. By default Volley times out the request after **2.5 seconds**, use a RetryPolicy if you are consistently getting this error.
+* **TimeoutError** -- Socket timeout, either server is too busy to handle the request or there is some network latency issue. By default Volley times out the request after **2.5 seconds**, use a RetryPolicy if you are consistently getting this error.
 
 
 You can use a simple helper like the following to display appropriate message when one of these exceptions occurs:
