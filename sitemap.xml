@@ -17,16 +17,22 @@
         <lastmod>2013-08-16T14:33:57+05:30</lastmod>
     </url>
     <url>
+        <loc>
+            http://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/
+        </loc>
+        <lastmod>2013-08-23T09:34:12+05:30</lastmod>
+    </url>
+    <url>
         <loc>http://arnab.ch/about/</loc>
         <lastmod>2013-07-27T14:50:53+05:30</lastmod>
     </url>
     <url>
         <loc>http://arnab.ch/blog/archives/</loc>
-        <lastmod>2013-08-16T14:33:57+05:30</lastmod>
+        <lastmod>2013-08-23T09:34:12+05:30</lastmod>
     </url>
     <url>
         <loc>http://arnab.ch/</loc>
-        <lastmod>2013-08-16T14:33:57+05:30</lastmod>
+        <lastmod>2013-08-23T09:34:12+05:30</lastmod>
     </url>
     <url>
         <loc>http://arnab.ch/robots.txt</loc>

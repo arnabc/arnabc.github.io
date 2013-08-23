@@ -4,7 +4,7 @@
   <title><![CDATA[Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-08-19T18:27:12+05:30</updated>
+  <updated>2013-08-23T09:50:16+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -12,6 +12,835 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
+    <link href="http://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
+    <updated>2013-08-21T22:24:00+05:30</updated>
+    <id>http://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
+    <content type="html"><![CDATA[<p>Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster. The good thing about Volley is that it abstracts away the low level details of what HTTP client library is being used under the hood and helps you focus on writing nice and clean RESTful HTTP requests. Additionally all requests in Volley are executed asynchronously on a different thread without blocking your &ldquo;main thread&rdquo;.</p>
+
+<!-- more -->
+
+
+<h2>What are the features that Volley provides?</h2>
+
+<p>Important features of the Volley library:</p>
+
+<ul>
+<li>A high level API to make asynchronous RESTful HTTP requests</li>
+<li>An elegant and robust Request queue</li>
+<li>An extensible architecture which allows developers to implement custom request and response handling mechanism</li>
+<li>Ability to use external HTTP client library</li>
+<li>Robust request caching policy</li>
+<li>Custom views to load and cache images from Network (<code>NetworkImageView</code>, <code>ImageLoader</code> etc)</li>
+</ul>
+
+
+<h2>Why use asynchronous HTTP requests?</h2>
+
+<p>In Android it is always a good practice to make HTTP requests asynchronously, in fact from HoneyComb onwards it is no longer just a &ldquo;good practice&rdquo;, you must make HTTP requests asynchronously off the main thread or else you&rsquo;ll get this nasty exception <code>android.os.NetworkOnMainThreadException</code>. Blocking the main thread has some serious consequences, it hampers UI rendering, harmful to smooth user experience and above all it can cause dreaded ANR (Application Not Responding). To avoid all these pitfalls you as a developer should always ensure that your HTTP requests are on a different thread.</p>
+
+<h2>How to use Volley</h2>
+
+<p>We are going to cover the following items in this blog post, by the end of it you should be able to have a clear understanding of Volley and how to use it in your application.</p>
+
+<ul>
+<li>Installing and using Volley as a library project</li>
+<li>Using Request Queue</li>
+<li>Making asynchronous JSON and String HTTP requests</li>
+<li>Cancelling requests</li>
+<li>Retrying failed requests, customizing request Timeout</li>
+<li>Setting Request Headers (HTTP headers)</li>
+<li>Using cookies</li>
+<li>Error Handling</li>
+</ul>
+
+
+<h3>Installing and using Volley as a library project</h3>
+
+<p>Volley is part of AOSP and right now it is not being distributed as a JAR, the easiest way to include Volley to your project is to clone the Volley repository and set it as a library project.</p>
+
+<h4>Using as a library project</h4>
+
+<p>Git clone the repository using the following command and then import it as Android library project:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git clone https://android.googlesource.com/platform/frameworks/volley
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Using as a JAR</h4>
+
+<p>Clone the repository as shown above and then run the following commands to export it as JAR and after that add the JAR file to your project&rsquo;s <code>/libs</code> folder:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># in Volley project root (ensure the `android` executable is in your path)</span>
+</span><span class='line'><span class="nv">$ </span>android update project -p .
+</span><span class='line'><span class="c"># the following command will create a JAR file and put it in ./bin</span>
+</span><span class='line'><span class="nv">$ </span>ant jar
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Using Request Queue</h3>
+
+<p>All requests in Volley are placed in a queue first and then processed, here is how you will be creating a request queue:</p>
+
+<figure class='code'><figcaption><span>RequestQueue </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">RequestQueue</span> <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="k">this</span><span class="o">);</span> <span class="c1">// &#39;this&#39; is Context</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ideally you should have one centralized place for your Queue, and the best place to initialize queue is in your <a href="http://developer.android.com/reference/android/app/Application.html">Application</a> class. Here is how this can be done:</p>
+
+<figure class='code'><figcaption><span>ApplicationController.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApplicationController</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Log or request TAG</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;VolleyPatterns&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Global request queue for Volley</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">RequestQueue</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * A singleton instance of the application class for easy access in other places</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="n">ApplicationController</span> <span class="n">sInstance</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// initialize the singleton</span>
+</span><span class='line'>        <span class="n">sInstance</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * @return ApplicationController singleton instance</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">ApplicationController</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sInstance</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * @return The Volley Request queue, the queue will be created if it is null</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">RequestQueue</span> <span class="nf">getRequestQueue</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// lazy initialize the request queue, the queue instance will be</span>
+</span><span class='line'>        <span class="c1">// created when it is accessed for the first time</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="n">getApplicationContext</span><span class="o">());</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Adds the specified request to the global queue, if tag is specified</span>
+</span><span class='line'><span class="cm">     * then it is used else Default TAG is used.</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param req</span>
+</span><span class='line'><span class="cm">     * @param tag</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">addToRequestQueue</span><span class="o">(</span><span class="n">Request</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">req</span><span class="o">,</span> <span class="n">String</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// set the default tag if tag is empty</span>
+</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">TextUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">tag</span><span class="o">)</span> <span class="o">?</span> <span class="n">TAG</span> <span class="o">:</span> <span class="n">tag</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">VolleyLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;Adding request to queue: %s&quot;</span><span class="o">,</span> <span class="n">req</span><span class="o">.</span><span class="na">getUrl</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">getRequestQueue</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Adds the specified request to the global queue using the Default TAG.</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param req</span>
+</span><span class='line'><span class="cm">     * @param tag</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">addToRequestQueue</span><span class="o">(</span><span class="n">Request</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// set the default tag if tag is empty</span>
+</span><span class='line'>        <span class="n">req</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">TAG</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">getRequestQueue</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Cancels all pending requests by the specified TAG, it is important</span>
+</span><span class='line'><span class="cm">     * to specify a TAG so that the pending/ongoing requests can be cancelled.</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param tag</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">cancelPendingRequests</span><span class="o">(</span><span class="n">Object</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">mRequestQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(</span><span class="n">tag</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Making asynchronous HTTP requests</h3>
+
+<p>Volley provides the following utility classes which you can use to make asynchronous HTTP requests:</p>
+
+<ul>
+<li><a href="http://goo.gl/CRMvRj">JsonObjectRequest</a> &mdash; To send and receive JSON Object from the Server</li>
+<li><a href="http://goo.gl/F02Ew3">JsonArrayRequest</a> &mdash; To receive JSON Array from the Server</li>
+<li><a href="http://goo.gl/c5DB8p">StringRequest</a> &mdash; To retrieve response body as String (ideally if you intend to parse the response by yourself)</li>
+</ul>
+
+
+<p><em>Note:</em> To send parameters in request body you need to override either <code>getParams()</code> or <code>getBody()</code> method of the request classes (as required) described below.</p>
+
+<h4>JsonObjectRequest</h4>
+
+<p>This class can be used to send and receive JSON object. An overloaded constructor of this class allows to set appropriate request method (DELETE, GET, POST and PUT). This is the class which you should be using frequently if you are working with a RESTful backend. The following examples show how to make GET and POST requests.</p>
+
+<p>Using HTTP GET method:</p>
+
+<figure class='code'><figcaption><span>JsonObjectRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="s">&quot;/volley/resource/12&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="c1">// pass second argument as &quot;null&quot; for GET requests</span>
+</span><span class='line'><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span>
+</span><span class='line'>       <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>               <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>               <span class="o">}</span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using HTTP POST method:</p>
+
+<figure class='code'><figcaption><span>JsonObjectRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="s">&quot;/volley/resource/12&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="c1">// Post params to be sent to the server</span>
+</span><span class='line'><span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">params</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="n">params</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;token&quot;</span><span class="o">,</span> <span class="s">&quot;AbCdEfGh123456&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">(</span><span class="n">params</span><span class="o">),</span>
+</span><span class='line'>       <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>               <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>               <span class="o">}</span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>JsonArrayRequest</h4>
+
+<p>This class can be used to retrieve <strong>JSON array</strong> but not <strong>JSON object</strong> and only HTTP GET is supported as of now. As it supports only GET, so if you are to specify some querystring parameters then append those in the URL itself. The constructor does not accept request parameters.</p>
+
+<figure class='code'><figcaption><span>JsonArrayRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="s">&quot;/volley/resource/all?count=20&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="n">JsonArrayRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonArrayRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">JSONArray</span><span class="o">&gt;</span> <span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONArray</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>StringRequest</h4>
+
+<p>This class can be used to retrieve the response from server as String, ideally you should use this class when you intend to parse the response by yourself, e.g. if it is XML. It also provides overloaded constructors to further customize your request.</p>
+
+<figure class='code'><figcaption><span>StringRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="s">&quot;/volley/resource/recent.xml&quot;</span><span class="o">;</span>
+</span><span class='line'><span class="n">StringRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">String</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Setting a priority to the request is possible, this may be desirable in some cases where you want to move certain requests higher up in the order. The requests are processed from higher priorities to lower priorities, in FIFO order. To set a priority you need to override the <code>getPriority()</code> method of the request class. The current available priorities are &ndash; <code>Priority.LOW</code>, <code>Priority.NORMAL</code>, <code>Priority.HIGH</code> and <code>Priority.IMMEDIATE</code>.</p>
+
+<h3>Cancelling requests</h3>
+
+<p>Volley provides powerful APIs to cancel pending or ongoing requests, one reason when you need to do this is if user rotates his device while a request is ongoing you need to cancel that because the Activity is going be restarted. The easiest way to cancel a request is to call the <code>cancelAll(tag)</code> method of the request queue, this will only work if you have set a <strong>tag on the request object</strong> before adding it to the queue. The ability to tag requests allows you to cancel all pending requests for that tag in one method call.</p>
+
+<p>Adding a request to the queue using a tag:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="s">&quot;My Tag&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As per the ApplicationController class shown above, this is how you&rsquo;ll add the request to the queue:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="s">&quot;My Tag&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Cancelling all requests with the specified tag:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mRequestQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(</span><span class="s">&quot;My Tag&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As per the ApplicationController class shown above, this is how you&rsquo;ll cancel the requests:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="s">&quot;My Tag&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Retrying failed requests and customizing request Timeout</h3>
+
+<p>There is no direct way to specify request timeout value in Volley, but there is a workaround, you need to set a RetryPolicy on the request object. The <code>DefaultRetryPolicy</code> class takes an argument called <em>initialTimeout</em>, this can be used to specify a request timeout, make sure the maximum retry count is 1 so that volley does not retry the request after the timeout has been exceeded.</p>
+
+<figure class='code'><figcaption><span>Setting Request Timeout </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setRetryPolicy</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultRetryPolicy</span><span class="o">(</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mf">1.0f</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommends.</p>
+
+<h3>Setting Request Headers (HTTP headers)</h3>
+
+<p>Sometimes it is necessary to add extra headers to the HTTP requests, one common case is to add an &ldquo;Authorization&rdquo; header for HTTP Basic Auth. Volley Request class provides a method called <code>getHeaders()</code> which you need to override to add your custom headers if necessary.</p>
+
+<p>Adding custom headers:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">(</span><span class="n">params</span><span class="o">),</span>
+</span><span class='line'>           <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;()</span> <span class="o">{</span>
+</span><span class='line'>               <span class="nd">@Override</span>
+</span><span class='line'>               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="c1">// handle response</span>
+</span><span class='line'>               <span class="o">}</span>
+</span><span class='line'>           <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>               <span class="nd">@Override</span>
+</span><span class='line'>               <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                   <span class="c1">// handle error                        </span>
+</span><span class='line'>               <span class="o">}</span>
+</span><span class='line'>           <span class="o">})</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>       <span class="nd">@Override</span>
+</span><span class='line'>       <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">getHeaders</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AuthFailureError</span> <span class="o">{</span>
+</span><span class='line'>           <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'>           <span class="n">headers</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;CUSTOM_HEADER&quot;</span><span class="o">,</span> <span class="s">&quot;Yahoo&quot;</span><span class="o">);</span>
+</span><span class='line'>           <span class="n">headers</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;ANOTHER_CUSTOM_HEADER&quot;</span><span class="o">,</span> <span class="s">&quot;Google&quot;</span><span class="o">);</span>
+</span><span class='line'>           <span class="k">return</span> <span class="n">headers</span><span class="o">;</span>
+</span><span class='line'>       <span class="o">}</span>
+</span><span class='line'>   <span class="o">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Using cookies</h3>
+
+<p>There is no direct API through which you can set cookies in Volley. This makes sense because the core philosophy of Volley is to provide clean APIs to write RESTful HTTP requests, these days most of the  RESTful API providers prefer authentication tokens instead of cookies. Using cookies in Volley is a bit more involed process and not very straight forward.</p>
+
+<p>Here is a modified version of the <code>getRequestQueue()</code> method of our ApplicationController class shown above, also contains the rough code required to set a cookie:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// http client instance</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">DefaultHttpClient</span> <span class="n">mHttpClient</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">RequestQueue</span> <span class="nf">getRequestQueue</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// lazy initialize the request queue, the queue instance will be</span>
+</span><span class='line'>    <span class="c1">// created when it is accessed for the first time</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// Create an instance of the Http client. </span>
+</span><span class='line'>        <span class="c1">// We need this in order to access the cookie store</span>
+</span><span class='line'>        <span class="n">mHttpClient</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DefaultHttpClient</span><span class="o">();</span>
+</span><span class='line'>        <span class="c1">// create the request queue</span>
+</span><span class='line'>        <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="k">new</span> <span class="n">HttpClientStack</span><span class="o">(</span><span class="n">mHttpClient</span><span class="o">));</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Method to set a cookie</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCookie</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">CookieStore</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">mHttpClient</span><span class="o">.</span><span class="na">getCookieStore</span><span class="o">();</span>
+</span><span class='line'>    <span class="c1">// create a cookie</span>
+</span><span class='line'>    <span class="n">cs</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="k">new</span> <span class="n">BasicClientCookie2</span><span class="o">(</span><span class="s">&quot;cookie&quot;</span><span class="o">,</span> <span class="s">&quot;spooky&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the cookie before adding the request to the queue</span>
+</span><span class='line'><span class="n">setCookie</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// add the request to the queue</span>
+</span><span class='line'><span class="n">mRequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Error Handling</h3>
+
+<p>As you have seen in the above code examples when you create a request object in Volley you need to specify  an error listener, Volley invokes the <code>onErrorResponse</code> callback method of that listener passing an instance of the <code>VolleyError</code> object when there is an error while performing the request.</p>
+
+<p>The following is the list of exceptions in Volley:</p>
+
+<ul>
+<li><strong>AuthFailureError</strong> &mdash; If you are trying to do Http Basic authentication then this error is most likely to come.</li>
+<li><strong>NetworkError</strong> &mdash; Socket disconnection, server down, DNS issues might result in this error.</li>
+<li><strong>NoConnectionError</strong> &mdash; Similar to NetworkError, but fires when device does not have internet connection, your error handling logic can club <code>NetworkError</code> and <code>NoConnectionError</code> together and treat them similarly.</li>
+<li><strong>ParseError</strong> &mdash; While using <code>JsonObjectRequest</code> or <code>JsonArrayRequest</code> if the received JSON is malformed then this exception will be generated. If you get this error then it is a problem that should be fixed instead of being handled.</li>
+<li><strong>ServerError</strong> &mdash; The server responded with an error, most likely with <em>4xx</em> or <em>5xx</em> HTTP status codes.</li>
+<li><strong>TimeoutError</strong> &mdash; Socket timeout, either server is too busy to handle the request or their is some network latency issue. By default Volley times out the request after <strong>2.5 seconds</strong>, use a RetryPolicy if you are consistently getting this error.</li>
+</ul>
+
+
+<p>You can use a simple helper like the following to display appropriate message when one of these exceptions occurs:</p>
+
+<figure class='code'><figcaption><span>VolleyErrorHelper.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">VolleyErrorHelper</span> <span class="o">{</span>
+</span><span class='line'>     <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Returns appropriate message which is to be displayed to the user </span>
+</span><span class='line'><span class="cm">     * against the specified error object.</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param error</span>
+</span><span class='line'><span class="cm">     * @param context</span>
+</span><span class='line'><span class="cm">     * @return</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getMessage</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">TimeoutError</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_server_down</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">isServerProblem</span><span class="o">(</span><span class="n">error</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nf">handleServerError</span><span class="o">(</span><span class="n">error</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">isNetworkProblem</span><span class="o">(</span><span class="n">error</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">no_internet</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_error</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">  * Determines whether the error is related to network</span>
+</span><span class='line'><span class="cm">  * @param error</span>
+</span><span class='line'><span class="cm">  * @return</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isNetworkProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">  * Determines whether the error is related to server</span>
+</span><span class='line'><span class="cm">  * @param error</span>
+</span><span class='line'><span class="cm">  * @return</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isServerProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">ServerError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">AuthFailureError</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">  * Handles the server error, tries to determine whether to show a stock message or to </span>
+</span><span class='line'><span class="cm">  * show a message retrieved from the server.</span>
+</span><span class='line'><span class="cm">  * </span>
+</span><span class='line'><span class="cm">  * @param err</span>
+</span><span class='line'><span class="cm">  * @param context</span>
+</span><span class='line'><span class="cm">  * @return</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">handleServerError</span><span class="o">(</span><span class="n">Object</span> <span class="n">err</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">VolleyError</span> <span class="n">error</span> <span class="o">=</span> <span class="o">(</span><span class="n">VolleyError</span><span class="o">)</span> <span class="n">err</span><span class="o">;</span>
+</span><span class='line'>  
+</span><span class='line'>      <span class="n">NetworkResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="na">networkResponse</span><span class="o">;</span>
+</span><span class='line'>  
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">response</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">switch</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">statusCode</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">case</span> <span class="mi">404</span><span class="o">:</span>
+</span><span class='line'>            <span class="k">case</span> <span class="mi">422</span><span class="o">:</span>
+</span><span class='line'>            <span class="k">case</span> <span class="mi">401</span><span class="o">:</span>
+</span><span class='line'>                <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="c1">// server might return error like this { &quot;error&quot;: &quot;Some error occured&quot; }</span>
+</span><span class='line'>                    <span class="c1">// Use &quot;Gson&quot; to parse the result</span>
+</span><span class='line'>                    <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Gson</span><span class="o">().</span><span class="na">fromJson</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">),</span>
+</span><span class='line'>                            <span class="k">new</span> <span class="n">TypeToken</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>                            <span class="o">}.</span><span class="na">getType</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>                    <span class="k">if</span> <span class="o">(</span><span class="n">result</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">result</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>                        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">);</span>
+</span><span class='line'>                    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>                <span class="c1">// invalid request</span>
+</span><span class='line'>                <span class="k">return</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>                <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_server_down</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_error</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Volley is really a nice library and you should seriously consider giving this a try. It will help you simplify your network requests and also add a ton of additional benefits.</p>
+
+<p>I understand that it&rsquo;s a tl;dr post, actually I tried to be as comprehensive as possible, I am planning to come up with another post about image loading using Volley and some gotchas that I noticed while using the library in one of my projects, till then stay tuned.</p>
+
+<p>Thanks for reading, I hope you enjoyed this :&ndash;)</p>
+
+<h2>References</h2>
+
+<ul>
+<li>NetworkOnMainThreadException &mdash; <a href="http://developer.android.com/reference/android/os/NetworkOnMainThreadException.html">http://developer.android.com/reference/android/os/NetworkOnMainThreadException.html</a></li>
+<li>Application &mdash; <a href="http://developer.android.com/reference/android/app/Application.html">http://developer.android.com/reference/android/app/Application.html</a></li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
@@ -1047,7 +1876,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#58;&#x62;&#105;&#x7a;&#x40;&#x71;&#117;&#x61;&#x64;&#x6e;&#x6f;&#x64;&#101;&#46;&#x63;&#x6f;&#x6d;">&#x62;&#105;&#x7a;&#x40;&#113;&#x75;&#97;&#x64;&#110;&#x6f;&#x64;&#101;&#46;&#x63;&#111;&#109;</a>, we&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#109;&#97;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#98;&#105;&#122;&#x40;&#113;&#117;&#x61;&#100;&#x6e;&#x6f;&#100;&#x65;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#105;&#x7a;&#x40;&#113;&#117;&#97;&#100;&#110;&#111;&#x64;&#101;&#x2e;&#99;&#x6f;&#109;</a>, we&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>
