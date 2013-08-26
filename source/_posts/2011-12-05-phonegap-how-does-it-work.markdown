@@ -88,7 +88,7 @@ The following resouces can be useful for HTML5 based mobile apps development (no
 
 * [jQuery Mobile](http://jquerymobile.com)
 * [Jo HTML5 App Framework](http://joapp.com)
-* [Sencha Touch - Commercial](www.sencha.com/products/touch)
+* [Sencha Touch - Commercial](http://www.sencha.com/products/touch)
 * [jQTouch](http://jqtouch.com)
 * [AppMobi](http://appmobi.com)
 * [DHTMLX Touch](http://dhtmlx.com/touch/)
