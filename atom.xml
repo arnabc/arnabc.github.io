@@ -4,7 +4,7 @@
   <title><![CDATA[Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-08-26T11:33:58+05:30</updated>
+  <updated>2013-09-02T09:57:55+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -12,6 +12,53 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
+    <link href="http://arnab.ch/blog/2013/08/developing-kiosk-mode-applications-in-android/"/>
+    <updated>2013-08-28T19:07:00+05:30</updated>
+    <id>http://arnab.ch/blog/2013/08/developing-kiosk-mode-applications-in-android</id>
+    <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges that you&rsquo;ll face when developing these applications.</p>
+
+<!--more-->
+
+
+<h2>Things to consider before developing the app</h2>
+
+<ul>
+<li>Developing for the masses? Will be distributed through the Play store ? Not a good use case for Kiosk mode applications IMHO don&rsquo;t do it, I know their are applications out there on Play store and I also know how to bypass them. Might work for a very specific need for example ToddlerLock app.</li>
+<li>If you are developing it for controlled distribution, not through the Play store, then finalize the type of devices which will be used to distribute your app. Most common scenario is that it will be a cheap Chinese made tablet with either Android 2.2+ or Android 4.0+. Get familiar with the device first, figure out how many hardware keys are there and how can you block or modify them.</li>
+<li>Savvy users can bypass your restriction. Nothing in this world is completely secure so always watch out for surprises.</li>
+</ul>
+
+
+<p><strong>Note:</strong> I will mainly focus on controlled distribution where you as a developer has physical control over the devices, developing such applications for common people to use on their phones and tablet is not ideal IMHO and I don&rsquo;t want to deal with that because it is too complicated and does not work most of the time.</p>
+
+<h2>Approaches for developing Kiosk Mode applications</h2>
+
+<p>Following are the two approaches that you can take depending on your expertise and skill.</p>
+
+<ul>
+<li>Developing as a Launcher application</li>
+<li>Building a custom ROM</li>
+</ul>
+
+
+<h3>Developing as a Launcher Application</h3>
+
+<p>This approach is the easiest one that you can take, developing a Launcher application is fairly easy and you can get going quickly without much of a trouble. Let me roughly list out the items which are important for developing Kiosk mode applications:</p>
+
+<ul>
+<li>Only your app is allowed run at any given point of time or a set of whitelisted applications (ideally developed by you) are allowed to run.</li>
+<li></li>
+</ul>
+
+
+<h2>Conclusion</h2>
+
+<p>I hope you don&rsquo;t have to develop these apps ever because it is so complicated and plagued by device incompatibilities that it will take the joy out of your development, you&rsquo;ll end up putting hack after hack and would spend enormous energy to make it work if you are to distribute your app through Play store. If you are aiming for a controlled distribution where you decide which device should be used, then it will be less painful.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
@@ -1768,6 +1815,48 @@
   </entry>
   
   <entry>
+    <title type="html"><![CDATA[Danger of Using Same Password Everywhere]]></title>
+    <link href="http://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere/"/>
+    <updated>2012-09-01T23:23:00+05:30</updated>
+    <id>http://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere</id>
+    <content type="html"><![CDATA[<p>It has been said many times before by a lot of great people from the world of Computer Security and I am going to say it again, yes again, even though you don&rsquo;t like it!</p>
+
+<blockquote><p><big>Do not use same password everywhere</big></p></blockquote>
+
+<p>Why not? No one can guess my password, it&rsquo;s ultra-strong, it contains letters, digits and even some special characters, I have even tested it with <a href="http://www.passwordmeter.com/">Password Strength Meter</a>, so it&rsquo;s simply unbreakable :&ndash;).</p>
+
+<p>Indeed your password is unbreakable and even unguessable but there is a very good chance that you&rsquo;ll lay it bare without even knowing it. Surprised right? Want to know how is this possible? Keep reading, I am going to tell you about the possibilities.</p>
+
+<!--more-->
+
+
+<p>These days we spend a considerable amount of time on the Internet looking for useful stuff that we would like to use. Most of these websites require signing up to the service in order to use it, during that process it also asks you to create an &ldquo;username/password&rdquo; and also your email id so that they can communicate with you. The problem lies right there in the process when you create an &ldquo;username&rdquo; and &ldquo;password&rdquo;. If you are a person who mostly uses same password everywhere, then you are at risk without even realizing it.</p>
+
+<p>So what is the risk? The risk is, you don&rsquo;t know whether the site that you are signing up is actually <strong>storing your password in plain text</strong> or not. Logically, the website should <strong>encrypt</strong> your password before storing it in the database, but not all websites do that. There aren&rsquo;t many ways that you can discover whether they are storing it in plain text or in encrypted form. But, there is a way and that is if you receive a confirmation email from that site where they have mentioned your username and password then it clearly is an indication that they are storing it in <strong>plain text</strong> &ndash; remember one thing <strong>a one-way encrypted password cannot be converted back to plain text</strong> (theoretically and the cost of decrypting is much higher), so it is technically impossible for that website to send you your password in plain text form. The other option is to try out the &ldquo;Forget Password&rdquo; facility and see if they are sending you your old password in plain text to retrieve your account.</p>
+
+<p>You may ask why storing password in plain text is wrong ? It is wrong because <strong>nothing in this world is completely secure</strong>. If that site is ever compromised and the attacker gets hold of the database then he will have a list of users with their usernames, emails and passwords ( in plain text ), the damage is not limited to that website only, it is much bigger than you can even think of. Let&rsquo;s imagine that you are an attacker and you have successfully compromised &ldquo;example.com&rdquo; which stores the user detail (password) in plain text, now you have a list of users with their email ids and the passwords that they have used while signing up to &ldquo;example.com&rdquo;, now if you try to log in to the users&#8217; email accounts using the password you have on that list for each email ids, you&rsquo;ll see that at least 20-30% of users or even more have the same password. See the pattern? There is a Domino effect once you lose access to your email account, you&rsquo;ll lose access to your Facebook, Twitter and probably other services for example Bank accounts.</p>
+
+<p>Here is a list of things that you can follow to minimize the damage as much as possible:</p>
+
+<ul>
+<li>Don&rsquo;t be an idiot, the safety of your valuable data should be extremely important to you. It is not necessary to jump right into the fray the moment you receive an invite email from your friend about a cool new site. If you really want to try out the site then create a fake account first ( you can create fake email ids at <a href="http://www.mailinator.com">Mailinator</a> ).</li>
+<li>Use separate password for each of your important email/social network accounts. There are some password generators that you can use e.g. <strong>1Password</strong></li>
+<li>See if that site is offering other ways of authentication without sharing/giving your email id or password, for example OpenID and OAuth. Nowadays Facebook, Twitter, Google and Yahoo all provide OAuth/OpenID authentication service for third-party websites.</li>
+<li>Search in your inbox to see if you have received any email earlier from a website where they had sent you your username and password in plain text, if you find one then try deleting that account if not possible then see whether the password matches with any of your email ids, if it does then change your password immediately.</li>
+</ul>
+
+
+<p>I know even all the steps mentioned above are not 100% foolproof, but at least if you are aware of the fact then it will surely help you minimize the risk. This is more like a &ldquo;Social Engineering&rdquo; problem, if you can understand this then take necessary steps to prevent it as much as possible.</p>
+
+<h2>For websites developers</h2>
+
+<p>The safety and security of users&#8217; data is extremely important, it is always a good practice ( rather a must-have practice ) to encrypt sensitive user data. Storing passwords in plain text is utterly irresponsible and disrespectful act to the users. Also make sure that passwords are filtered out from your server&rsquo;s log files. A little bit common sense can help protect the Internet as well as users.</p>
+
+<blockquote><p>Here is a webcomic from XKCD on password reuse &ndash; <a href="http://xkcd.com/792/">http://xkcd.com/792/</a></p></blockquote>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
     <link href="http://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/"/>
     <updated>2012-01-21T00:26:00+05:30</updated>
@@ -1876,7 +1965,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x62;&#x69;&#122;&#64;&#113;&#117;&#97;&#100;&#x6e;&#111;&#100;&#101;&#46;&#x63;&#111;&#109;">&#98;&#105;&#x7a;&#64;&#x71;&#x75;&#97;&#x64;&#110;&#111;&#x64;&#x65;&#x2e;&#99;&#111;&#109;</a>, we&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#98;&#105;&#x7a;&#64;&#113;&#117;&#x61;&#100;&#110;&#x6f;&#x64;&#x65;&#x2e;&#99;&#111;&#x6d;">&#x62;&#105;&#122;&#64;&#x71;&#117;&#97;&#x64;&#110;&#x6f;&#100;&#101;&#46;&#99;&#111;&#x6d;</a>, we&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>
@@ -1996,6 +2085,58 @@
 <h2>Conclusion</h2>
 
 <p>PhoneGap provides an opportunity to a vast pool of web developers reusing their existing skills to develop applications for mobile phones, which in future is going to be one of the most important medium to access information and content in internet. As the phones become more powerful, the new capabilities will be available in your arsenal. The recent developments in HTML5 based technologies also usher a new change in this segment. Do not miss the bus and keep exploring PhoneGap.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA["new" Operator in JavaScript]]></title>
+    <link href="http://arnab.ch/blog/2010/04/new-operator-in-javascript/"/>
+    <updated>2010-04-20T09:10:00+05:30</updated>
+    <id>http://arnab.ch/blog/2010/04/new-operator-in-javascript</id>
+    <content type="html"><![CDATA[<p>In JavaScript, there’s an operator called <code>new</code> which we use to create an instance of an object (i.e Constructor function). So, what does <strong>new</strong> do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the <strong>new</strong> operator.</p>
+
+<!--more-->
+
+
+<p>Consider the following example:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above code pretty much says that you first create an instance of the constructor function (note the upper case first letter, it is a convention not a rule ) using <code>new</code> operator, once that statement executes you now have an object as the value of <code>foo</code> and in the next line it simply prints the “<em>name”</em> property of that object, which in this case is an instance variable of the constructor function &ldquo;Foo&rdquo;.</p>
+
+<p>Take a look at the example below and guess what would be the value of <code>foo</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>     <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'>     <span class="k">return</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Interesting thing is that in this case the value of <code>foo</code> is still an object, but we did return a String, so why the hell <code>foo</code> contains an object? Well, the purpose of the <strong>new</strong> keyword is to ensure that you always get an object, so anything other than object is discarded, if you return an object then that will be used else a new object is created and returned. Now if we replace our return statement using this code <code>return { prop: 'Foo' };</code> then the value of <code>foo</code> will have a different value altogether and accessing <code>foo.name</code> will result in <code>undefined</code>.</p>
+
+<p>Interestingly, if you return <code>null</code> then that will be NOT be used, even though you might think that <em>null</em> is an object and <code>typeof(null) === 'object'</code>, so it should use that. In fact, it does not, it appears that <strong>new</strong> returns only objects which can evaluate to truthy value.</p>
+
+<p>The last but not the least, if you return a <strong>function</strong> other than object then the function will be used. Why? Because functions are objects too, only difference is that they are special objects, that’s why there’s a separation between objects and functions, the <code>typeof</code> operator handles that properly, but in this case it appears that the <strong>new</strong> doesn&rsquo;t really care about that.</p>
 ]]></content>
   </entry>
   

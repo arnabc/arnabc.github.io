@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Security, | Arnab Chakraborty]]></title>
+  <link href="http://arnab.ch/blog/categories/security/atom.xml" rel="self"/>
+  <link href="http://arnab.ch/"/>
+  <updated>2013-09-02T09:57:55+05:30</updated>
+  <id>http://arnab.ch/</id>
+  <author>
+    <name><![CDATA[Arnab Chakraborty]]></name>
+    <email><![CDATA[arnabc@webgyani.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Danger of Using Same Password Everywhere]]></title>
+    <link href="http://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere/"/>
+    <updated>2012-09-01T23:23:00+05:30</updated>
+    <id>http://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere</id>
+    <content type="html"><![CDATA[<p>It has been said many times before by a lot of great people from the world of Computer Security and I am going to say it again, yes again, even though you don&rsquo;t like it!</p>
+
+<blockquote><p><big>Do not use same password everywhere</big></p></blockquote>
+
+<p>Why not? No one can guess my password, it&rsquo;s ultra-strong, it contains letters, digits and even some special characters, I have even tested it with <a href="http://www.passwordmeter.com/">Password Strength Meter</a>, so it&rsquo;s simply unbreakable :&ndash;).</p>
+
+<p>Indeed your password is unbreakable and even unguessable but there is a very good chance that you&rsquo;ll lay it bare without even knowing it. Surprised right? Want to know how is this possible? Keep reading, I am going to tell you about the possibilities.</p>
+
+<!--more-->
+
+
+<p>These days we spend a considerable amount of time on the Internet looking for useful stuff that we would like to use. Most of these websites require signing up to the service in order to use it, during that process it also asks you to create an &ldquo;username/password&rdquo; and also your email id so that they can communicate with you. The problem lies right there in the process when you create an &ldquo;username&rdquo; and &ldquo;password&rdquo;. If you are a person who mostly uses same password everywhere, then you are at risk without even realizing it.</p>
+
+<p>So what is the risk? The risk is, you don&rsquo;t know whether the site that you are signing up is actually <strong>storing your password in plain text</strong> or not. Logically, the website should <strong>encrypt</strong> your password before storing it in the database, but not all websites do that. There aren&rsquo;t many ways that you can discover whether they are storing it in plain text or in encrypted form. But, there is a way and that is if you receive a confirmation email from that site where they have mentioned your username and password then it clearly is an indication that they are storing it in <strong>plain text</strong> &ndash; remember one thing <strong>a one-way encrypted password cannot be converted back to plain text</strong> (theoretically and the cost of decrypting is much higher), so it is technically impossible for that website to send you your password in plain text form. The other option is to try out the &ldquo;Forget Password&rdquo; facility and see if they are sending you your old password in plain text to retrieve your account.</p>
+
+<p>You may ask why storing password in plain text is wrong ? It is wrong because <strong>nothing in this world is completely secure</strong>. If that site is ever compromised and the attacker gets hold of the database then he will have a list of users with their usernames, emails and passwords ( in plain text ), the damage is not limited to that website only, it is much bigger than you can even think of. Let&rsquo;s imagine that you are an attacker and you have successfully compromised &ldquo;example.com&rdquo; which stores the user detail (password) in plain text, now you have a list of users with their email ids and the passwords that they have used while signing up to &ldquo;example.com&rdquo;, now if you try to log in to the users' email accounts using the password you have on that list for each email ids, you&rsquo;ll see that at least 20-30% of users or even more have the same password. See the pattern? There is a Domino effect once you lose access to your email account, you&rsquo;ll lose access to your Facebook, Twitter and probably other services for example Bank accounts.</p>
+
+<p>Here is a list of things that you can follow to minimize the damage as much as possible:</p>
+
+<ul>
+<li>Don&rsquo;t be an idiot, the safety of your valuable data should be extremely important to you. It is not necessary to jump right into the fray the moment you receive an invite email from your friend about a cool new site. If you really want to try out the site then create a fake account first ( you can create fake email ids at <a href="http://www.mailinator.com">Mailinator</a> ).</li>
+<li>Use separate password for each of your important email/social network accounts. There are some password generators that you can use e.g. <strong>1Password</strong></li>
+<li>See if that site is offering other ways of authentication without sharing/giving your email id or password, for example OpenID and OAuth. Nowadays Facebook, Twitter, Google and Yahoo all provide OAuth/OpenID authentication service for third-party websites.</li>
+<li>Search in your inbox to see if you have received any email earlier from a website where they had sent you your username and password in plain text, if you find one then try deleting that account if not possible then see whether the password matches with any of your email ids, if it does then change your password immediately.</li>
+</ul>
+
+
+<p>I know even all the steps mentioned above are not 100% foolproof, but at least if you are aware of the fact then it will surely help you minimize the risk. This is more like a &ldquo;Social Engineering&rdquo; problem, if you can understand this then take necessary steps to prevent it as much as possible.</p>
+
+<h2>For websites developers</h2>
+
+<p>The safety and security of users' data is extremely important, it is always a good practice ( rather a must-have practice ) to encrypt sensitive user data. Storing passwords in plain text is utterly irresponsible and disrespectful act to the users. Also make sure that passwords are filtered out from your server&rsquo;s log files. A little bit common sense can help protect the Internet as well as users.</p>
+
+<blockquote><p>Here is a webcomic from XKCD on password reuse &ndash; <a href="http://xkcd.com/792/">http://xkcd.com/792/</a></p></blockquote>
+]]></content>
+  </entry>
+  
+</feed>

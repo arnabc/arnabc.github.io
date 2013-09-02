@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: JavaScript | Arnab Chakraborty]]></title>
+  <link href="http://arnab.ch/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="http://arnab.ch/"/>
+  <updated>2013-09-02T09:57:55+05:30</updated>
+  <id>http://arnab.ch/</id>
+  <author>
+    <name><![CDATA[Arnab Chakraborty]]></name>
+    <email><![CDATA[arnabc@webgyani.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA["new" Operator in JavaScript]]></title>
+    <link href="http://arnab.ch/blog/2010/04/new-operator-in-javascript/"/>
+    <updated>2010-04-20T09:10:00+05:30</updated>
+    <id>http://arnab.ch/blog/2010/04/new-operator-in-javascript</id>
+    <content type="html"><![CDATA[<p>In JavaScript, there’s an operator called <code>new</code> which we use to create an instance of an object (i.e Constructor function). So, what does <strong>new</strong> do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the <strong>new</strong> operator.</p>
+
+<!--more-->
+
+
+<p>Consider the following example:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The above code pretty much says that you first create an instance of the constructor function (note the upper case first letter, it is a convention not a rule ) using <code>new</code> operator, once that statement executes you now have an object as the value of <code>foo</code> and in the next line it simply prints the “<em>name”</em> property of that object, which in this case is an instance variable of the constructor function &ldquo;Foo&rdquo;.</p>
+
+<p>Take a look at the example below and guess what would be the value of <code>foo</code>:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">pre</span><span class="o">&gt;&lt;</span><span class="nx">code</span><span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'> <span class="k">return</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="err">/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Interesting thing is that in this case the value of <code>foo</code> is still an object, but we did return a String, so why the hell <code>foo</code> contains an object? Well, the purpose of the <strong>new</strong> keyword is to ensure that you always get an object, so anything other than object is discarded, if you return an object then that will be used else a new object is created and returned. Now if we replace our return statement using this code <code>return { prop: 'Foo' };</code> then the value of <code>foo</code> will have a different value altogether and accessing <code>foo.name</code> will result in <code>undefined</code>.</p>
+
+<p>Interestingly, if you return <code>null</code> then that will be NOT be used, even though you might think that <em>null</em> is an object and <code>typeof(null) === 'object'</code>, so it should use that. In fact, it does not, it appears that <strong>new</strong> returns only objects which can evaluate to truthy value.</p>
+
+<p>The last but not the least, if you return a <strong>function</strong> other than object then the function will be used. Why? Because functions are objects too, only difference is that they are special objects, that’s why there’s a separation between objects and functions, the <code>typeof</code> operator handles that properly, but in this case it appears that the <strong>new</strong> doesn&rsquo;t really care about that.</p>
+]]></content>
+  </entry>
+  
+</feed>
