@@ -1,6 +1,8 @@
 ---
 layout: post
 title: "Asynchronous HTTP requests in Android using Volley"
+description: "Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster."
+keywords: "Volley, Android, Asynchronous HTTP"
 date: 2013-08-21 22:24
 comments: true
 categories: Android Volley
