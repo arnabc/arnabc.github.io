@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-09-02T09:57:55+05:30</updated>
+  <updated>2013-09-02T10:45:40+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -12,53 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
-    <link href="http://arnab.ch/blog/2013/08/developing-kiosk-mode-applications-in-android/"/>
-    <updated>2013-08-28T19:07:00+05:30</updated>
-    <id>http://arnab.ch/blog/2013/08/developing-kiosk-mode-applications-in-android</id>
-    <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges that you&rsquo;ll face when developing these applications.</p>
-
-<!--more-->
-
-
-<h2>Things to consider before developing the app</h2>
-
-<ul>
-<li>Developing for the masses? Will be distributed through the Play store ? Not a good use case for Kiosk mode applications IMHO don&rsquo;t do it, I know their are applications out there on Play store and I also know how to bypass them. Might work for a very specific need for example ToddlerLock app.</li>
-<li>If you are developing it for controlled distribution, not through the Play store, then finalize the type of devices which will be used to distribute your app. Most common scenario is that it will be a cheap Chinese made tablet with either Android 2.2+ or Android 4.0+. Get familiar with the device first, figure out how many hardware keys are there and how can you block or modify them.</li>
-<li>Savvy users can bypass your restriction. Nothing in this world is completely secure so always watch out for surprises.</li>
-</ul>
-
-
-<p><strong>Note:</strong> I will mainly focus on controlled distribution where you as a developer has physical control over the devices, developing such applications for common people to use on their phones and tablet is not ideal IMHO and I don&rsquo;t want to deal with that because it is too complicated and does not work most of the time.</p>
-
-<h2>Approaches for developing Kiosk Mode applications</h2>
-
-<p>Following are the two approaches that you can take depending on your expertise and skill.</p>
-
-<ul>
-<li>Developing as a Launcher application</li>
-<li>Building a custom ROM</li>
-</ul>
-
-
-<h3>Developing as a Launcher Application</h3>
-
-<p>This approach is the easiest one that you can take, developing a Launcher application is fairly easy and you can get going quickly without much of a trouble. Let me roughly list out the items which are important for developing Kiosk mode applications:</p>
-
-<ul>
-<li>Only your app is allowed run at any given point of time or a set of whitelisted applications (ideally developed by you) are allowed to run.</li>
-<li></li>
-</ul>
-
-
-<h2>Conclusion</h2>
-
-<p>I hope you don&rsquo;t have to develop these apps ever because it is so complicated and plagued by device incompatibilities that it will take the joy out of your development, you&rsquo;ll end up putting hack after hack and would spend enormous energy to make it work if you are to distribute your app through Play store. If you are aiming for a controlled distribution where you decide which device should be used, then it will be less painful.</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
@@ -1922,7 +1875,7 @@ config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#x62;&#x69;&#x7a;&#x40;&#x71;&#117;&#x61;&#x64;&#x6e;&#111;&#100;&#x65;&#46;&#99;&#111;&#109;">&#98;&#105;&#x7a;&#x40;&#113;&#x75;&#97;&#x64;&#110;&#x6f;&#x64;&#x65;&#x2e;&#x63;&#111;&#109;</a>, we&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x62;&#x69;&#x7a;&#x40;&#113;&#117;&#97;&#x64;&#110;&#x6f;&#x64;&#x65;&#x2e;&#99;&#x6f;&#109;">&#x62;&#105;&#122;&#x40;&#x71;&#117;&#97;&#100;&#x6e;&#111;&#x64;&#x65;&#x2e;&#99;&#x6f;&#x6d;</a>, we&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>
