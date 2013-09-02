@@ -1,9 +1,11 @@
 ---
 layout: post
 title: "Danger of Using Same Password Everywhere"
+description: "Danger of using same password everywhere and the corresponding threat involved in this practice"
 date: 2012-09-01 23:23
 comments: false
 categories: Security, Password
+keywords: Security, Password, Encryption
 ---
 
 It has been said many times before by a lot of great people from the world of Computer Security and I am going to say it again, yes again, even though you don't like it!

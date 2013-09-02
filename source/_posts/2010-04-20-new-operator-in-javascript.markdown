@@ -1,9 +1,11 @@
 ---
 layout: post
 title: '"new" Operator in JavaScript'
+description: "new operator in JavaScript is used to create an instance of an object"
 date: 2010-04-20 09:10
 comments: false
 categories: JavaScript
+keywords: JavaScript, new-operator
 ---
 
 In JavaScript, there’s an operator called ```new``` which we use to create an instance of an object (i.e Constructor function). So, what does **new** do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the **new** operator. 
