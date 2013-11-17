@@ -359,6 +359,9 @@ That's it, you now have your own custom launcher application. Although a full-fl
 For those who wants to investigate further, do take a look at the default launcher application code here: [Android Stock Launcher App](https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/)
 
 
+**Update**: I wrote another post which provides a high-level overview of what all things are required to develop a "**kiosk-mode**" Android application. You can check it out here - [Developing kiosk-mode applications in Android](/blog/2013/11/developing-kiosk-mode-applications-in-android/)
+
+
 You can download the full source code used in this article from this Github [repository](https://github.com/arnabc/simplelauncher/zipball/master).
 
 <div class="github-widget" data-repo="arnabc/simplelauncher"></div>
