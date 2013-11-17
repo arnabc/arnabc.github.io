@@ -4,7 +4,7 @@
   <title><![CDATA[Category: launcher | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/launcher/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-09-02T10:45:40+05:30</updated>
+  <updated>2013-11-17T12:52:51+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -685,6 +685,8 @@
 <p>That&rsquo;s it, you now have your own custom launcher application. Although a full-fledged launcher app like the ones that come with Android phones has many features built into them, but you can use this as a basic building block and start writing a more advanced and complex launcher as you learn.</p>
 
 <p>For those who wants to investigate further, do take a look at the default launcher application code here: <a href="https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/">Android Stock Launcher App</a></p>
+
+<p><strong>Update</strong>: I wrote another post which provides a high-level overview of what all things are required to develop a &ldquo;<strong>kiosk-mode</strong>&rdquo; Android application. You can check it out here &ndash; <a href="/blog/2013/11/developing-kiosk-mode-applications-in-android/">Developing kiosk-mode applications in Android</a></p>
 
 <p>You can download the full source code used in this article from this Github <a href="https://github.com/arnabc/simplelauncher/zipball/master">repository</a>.</p>
 

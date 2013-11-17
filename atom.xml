@@ -4,7 +4,7 @@
   <title><![CDATA[Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-09-02T10:45:40+05:30</updated>
+  <updated>2013-11-17T12:52:51+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
+    <link href="http://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
+    <updated>2013-11-17T11:40:00+05:30</updated>
+    <id>http://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
+    <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges you&rsquo;ll face while developing these type of applications. This is a high-level overview of the effort involved, and not meant to provide code examples which will be beyond the scope of the post.</p>
+
+<!--more-->
+
+
+<h2>General requirements for such applications</h2>
+
+<ul>
+<li>Only one app is allowed to run.</li>
+<li>Only whitelisted contacts are allowed to be contacted (via Phone or SMS)</li>
+<li>Only whitelisted apps are allowed to be used.</li>
+<li>Tracking which applications are installed or uninstalled.</li>
+<li>Disable status bar.</li>
+</ul>
+
+
+<h2>Things to consider before developing the app</h2>
+
+<ul>
+<li>Developing for the masses? Will it be distributed through the Play store ? Not a good use case for Kiosk mode applications IMHO don&rsquo;t do it, users don&rsquo;t like it when you take over their phone and don&rsquo;t allow them to use the phone freely. Might work for a very specific niche for example a mounted Tablet in a restaurant which displays today&rsquo;s menus and recipes.</li>
+<li>If you are developing it for controlled distribution, not through the Play store, then finalize the type of devices which will be used to distribute your app. Most common scenario is that it will be a cheap Chinese tablet running either Android 4.0+. Get familiar with the device first, figure out how many hardware keys are there and which ones you need to block or modify.</li>
+<li>Savvy users can bypass your restrictions if the devices are not physically secured. Although nothing in this world is completely secure so always watch out for surprises.</li>
+</ul>
+
+
+<p><strong>My focus on this post will be controlled distribution where you as a developer have physical control over the devices.</strong></p>
+
+<h2>Approaches for developing Kiosk Mode applications</h2>
+
+<p>Following are the two approaches that you can take depending on your expertise and skill.</p>
+
+<ul>
+<li>Developing as a Launcher application</li>
+<li>Building a custom ROM</li>
+</ul>
+
+
+<h2>Developing as a Launcher Application</h2>
+
+<p>This approach is the easiest one that you can take, developing a Launcher application is fairly simple and you can quickly get going without much of a trouble. Let me roughly list out the items which you need to do:</p>
+
+<h4>Only your app is allowed to run always</h4>
+
+<p>As mentioned above make it a Launcher app and ensure that it is the default launcher app, after installation you can disable the old launcher app using <code>pm disable &lt;PACKAGE_OR_COMPONENT&gt;</code> command. Now as your launcher app is the default one so it will be started automatically on boot, nothing fancy here.</p>
+
+<h4>Detect when new applications are opened</h4>
+
+<p>In order to enforce control, you may need to detect when a new application is opened to figure out whether it is an allowed application or not. There are two ways that you can go about it:</p>
+
+<ul>
+<li>Run a repeated alarm, for example every 5 seconds and retrieve the topmost activity from the currently running applications and and see if that package is allowed to run if not then bring your home screen in the foreground and use <code>ActivityManager.killBackgroundProcess()</code> to kill that app (will not work for system apps though). There are caveats to this approach, it is heavy on resources and drains battery very quickly.</li>
+<li>Use <strong>AccessibilityService</strong> and it lets you know when a new application window is opened and then you can check which application is currently running and act accordingly. This is on demand and is not heavy on resources. The caveat is that you have to manually enable the service from <code>Settings --&gt; Accessibility</code>. Assuming physical control over the devices, so this should not be an issue, but it&rsquo;s manual and that&rsquo;s the downside.</li>
+</ul>
+
+
+<h4>Detect if new applications are installed or uninstalled</h4>
+
+<p>Android provides broadcast receivers for you to track when a new application is installed or uninstalled. Use them and log the activities accordingly.</p>
+
+<h4>Disable status bar</h4>
+
+<p>You cannot override the status bar,  so the only option is to run a background service and create a opaque overlay view and position it on top of the status bar, this status bar should consume all touch events (this is how custom status bar replacements apps work I think), you&rsquo;ll need <code>android.permission.SYSTEM_ALERT_WINDOW</code> permission to put your view on top of all other windows. Also you can make your Launcher app fullscreen as well.</p>
+
+<h4>Make your app a Device Administrator</h4>
+
+<p>Take advantage of Device Administrator features, this will provide some elevated access rights to perform administrative tasks, like remotely lock screen, wipe out the data etc.</p>
+
+<h4>Automatic Update</h4>
+
+<p>If you need automatic update support but don&rsquo;t want to distribute your app through Play Store, then you need to &ldquo;<strong>root</strong>&rdquo; the device and run a separate app which will update your app when there is a new version. This requires you to build a backend as well. I wrote a blog post on this topic some time ago, <a href="http://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/">Android auto-updating homescreen application</a>.</p>
+
+<h2>Building a custom ROM</h2>
+
+<p>This is by far the most preferable and a reliable approach. You can create your custom build right out of AOSP source code, but based on your device you will need some proprietary files. Take a look at the AOKP/CynogenMod for custom ROMS for your device.</p>
+
+<p>Building custom ROM is bit difficult as it will take you some time to fully grok the process but once you&rsquo;re through with this, then it will be alright. I suggest you try building a custom ROM from vanilla AOSP source and test it in Emulator using Virtual Device. It will also be a very good learning exercise for you.</p>
+
+<p>You need to build your own backend infrastructure for distribution and remote management.</p>
+
+<h2>Conclusion</h2>
+
+<p>Developing kiosk based applications are difficult but not impossible, the problem begins when you start to control the device&rsquo;s default functions, if you see that you need to completely lock-down a device then it is wiser that you go down the custom ROM path instead of trying to make it work in consumer grade Android phones.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
@@ -1478,6 +1568,8 @@
 
 <p>For those who wants to investigate further, do take a look at the default launcher application code here: <a href="https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/">Android Stock Launcher App</a></p>
 
+<p><strong>Update</strong>: I wrote another post which provides a high-level overview of what all things are required to develop a &ldquo;<strong>kiosk-mode</strong>&rdquo; Android application. You can check it out here &ndash; <a href="http://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android/">Developing kiosk-mode applications in Android</a></p>
+
 <p>You can download the full source code used in this article from this Github <a href="https://github.com/arnabc/simplelauncher/zipball/master">repository</a>.</p>
 
 <div class="github-widget" data-repo="arnabc/simplelauncher"></div>
@@ -1918,7 +2010,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#98;&#x69;&#122;&#x40;&#113;&#x75;&#97;&#x64;&#x6e;&#x6f;&#100;&#x65;&#x2e;&#x63;&#x6f;&#x6d;">&#98;&#105;&#122;&#64;&#x71;&#117;&#97;&#x64;&#x6e;&#x6f;&#100;&#101;&#46;&#99;&#111;&#109;</a>, we&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with us at <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#x62;&#x69;&#x7a;&#x40;&#x71;&#x75;&#97;&#100;&#110;&#111;&#x64;&#101;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#105;&#122;&#64;&#x71;&#x75;&#97;&#x64;&#x6e;&#x6f;&#x64;&#101;&#46;&#x63;&#x6f;&#x6d;</a>, we&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>
@@ -2090,6 +2182,35 @@
 <p>Interestingly, if you return <code>null</code> then that will be NOT be used, even though you might think that <em>null</em> is an object and <code>typeof(null) === 'object'</code>, so it should use that. In fact, it does not, it appears that <strong>new</strong> returns only objects which can evaluate to truthy value.</p>
 
 <p>The last but not the least, if you return a <strong>function</strong> other than object then the function will be used. Why? Because functions are objects too, only difference is that they are special objects, that’s why there’s a separation between objects and functions, the <code>typeof</code> operator handles that properly, but in this case it appears that the <strong>new</strong> doesn&rsquo;t really care about that.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[10 things a FrontEnd Engineer should know]]></title>
+    <link href="http://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know/"/>
+    <updated>2010-01-10T22:33:00+05:30</updated>
+    <id>http://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know</id>
+    <content type="html"><![CDATA[<p>Frontend engineering as it stands today is a bit of vague and unspecified territory, it’s still not clearly understood may be because of the lack of clarity around stuffs a frontend engineer does. To simply put, frontend engineering means understanding the browsers best, the work of a frontend engineer is what you see when you do “view source”. So, how can you become a frontend engineer? In this post I’ll list down some of the things that a would be frontend engineer should know about. Frontend engineers write software using HTML, CSS and JavaScript, and yes I meant ‘writing software’, because if you look at modern day web applications like Gmail, Yahoo! Mail, Google Wave all are complex applications which involves significant amount of JavaScript, CSS, HTML and other technologies. So basically it means a frontend engineer should be specialized in HTML, CSS and JavaScript. </p> <!--more--></p>
+
+<p>Below are the list of things that I would expect to see in a would be frontend engineer:</p>
+
+<ul>
+<li><strong>Semantic and non-semantic markup</strong> &ndash; Understanding the differences between semantic and non-semantic HTML is a key area in web development, in HTML we have different tags with different semantic meaning, a frontend engineer should know which tag to use when, it’s not a good practice to use &lt;DIV&gt; tag to display paragraphs even if both &lt;P&gt; and &lt;DIV&gt; visually look similar.</li>
+<li><strong>Rendering modes</strong> – Every browser for the sake of backward compatibility has implemented two types of rendering modes, and browser’s use DOCTYPE tag as the rendering mode switcher. It’s important to know about rendering modes because they drastically affect the way browsers render a webpage. Primarily, there are two rendering modes “Standards mode” and “Quirks mode”, some browsers even have “almost standards mode”. In “standards mode” browser will try to display a webpage in the most efficient way possible, where as in “quirks mode” browser will display the page in a backward compatible way.</li>
+<li><strong>Structure, presentation and behavior</strong> – These are the key design elements in building websites. The structure (HTML), presentation/styling (CSS) and behavior (JavaScript) should be separated out, which helps make you page modular and maintainable. Remember it also speeds up your site, because the presentation and behavior layer will likely be cached by the browser, which results in faster downloads. Use meaningful markup with Class and Ids as the possible hook for adding styling and behavior. Never use inline event handlers in your HTML, instead use Unobtrusive JavaScript to attach event handlers, which helps keep the markup clean.</li>
+<li><strong>Ability to hand code your HTML</strong> – There are some WYSIWYG editors out there in the market, but I would recommend not to use any one of them, instead learn to write HTML by hand coding, because this will give you the ability to create a visual picture of your page layout in your mind, if you continue this practice after some time you will notice that you can almost tell how many DIVs you need to create a particular layout just seeing that design. Remember that all those big web applications out there were created by hand coding HTML and CSS, once you are proficient writing HTML then you can use some code auto-completion utilities to speed things up a little bit.</li>
+<li><strong>CSS and browser quirks</strong> – The CSS stands for ‘Cascading Style Sheets’, here ‘Cascading’ means a way to determine which CSS rules are going to apply on a particular element. So it’s important to know how <em>Specificity</em>, <em>Order</em>, <em>Inheritance</em> and above all the <em>Box Model</em> are being calculated. Some browsers have terribly wrong implementation of some CSS standards so it is important to have the knowledge regarding browser workarounds, there are CSS hacks and fixes available for some browsers most notably Internet Explorer, which you can use or you might consider using _conditional-comments a_s a way to include special style sheet for that depending on your needs. Another thing in this context is the knowledge regarding ‘<a href="http://www.google.co.in/search?q=hasLayout">hasLayout</a>’ concept in IE6/7, this concept is one of the main reasons behind CSS bugs in above mentioned browsers.</li>
+<li><strong>JavaScript Language</strong> – Learn this language, it’s no toy language anymore and it’s not even distantly related with Java excluding the naming similarity. It is an Object-oriented language with <em>prototypal inheritance</em> pattern. This is the language which drives modern day web applications, since the advent of Ajax this period has seen a tremendous growth of JavaScript. I believe that the way <strong>HTML5</strong> is heading this language is going to be one of the most important programming languages in the next decade. JavaScript was designed in a hurry, so there are some rough edges and some incorrect implementation, hence it’s important to know the good and bad parts of the language. In modern web applications JavaScript interacts heavily with DOM(Document Object Model), so having a good understanding of DOM methods, traversal techniques, DOM manipulation are necessary. I recommend picking up <a href="http://www.amazon.com/Professional-JavaScript-Developers-Wrox-Programmer/dp/047022780X">Professional JavaScript for Web Developers</a>.</li>
+<li><strong>JavaScript and CSS Frameworks</strong> – Once you are well familiar with all the above concepts, it’s time to pick up few JavaScript and CSS frameworks. Nevertheless, the JavaScript Frameworks that you should check out are <a href="http://jquery.com/">jQuery</a>, <a href="http://developer.yahoo.com/yui/">YUI</a> and <a href="http://www.dojotoolkit.org/">Dojo</a> etc. and for CSS Frameworks there are <a href="http://wiki.github.com/stubbornella/oocss">OOCSS</a>, <a href="http://960.gs/">960.gs</a> and <a href="http://www.blueprintcss.org/">Blueprint</a> etc.. Even though you can go through with those libraries, I would recommend you should go through their source code whenever possible, this will give you a lot of insight into what’s happening and how those libraries have organized their code, you’ll learn a lot, I guarantee.</li>
+<li><strong>Website Optimization</strong> – This is a very important point, and you just cannot ignore it&#160; anymore. Latency is one of the main reason behind slow websites, but you can do very little about it, so focus on areas where optimization can give you significant result. Learn how to cache your assets using proper HTTP headers, serve your assets using Gzip, optimize images (there are some good tools around one example is <a href="http://github.com/kristoferbaxter/SmallerMaker">SmallerMaker</a> ), know how browsers do parallel downloading, consider using ‘Lazy Loading’ techniques, load scripts on-demand/on the fly when required and use CSS sprites where suitable(although you can take a peek at <em><a href="http://www.stevesouders.com/blog/2009/11/16/cssembed-automatically-data-uri-ize/">Data URIs</a></em>). For more info check out <a href="http://www.stevesouders.com/">stevesouders.com</a>.</li>
+<li><strong>Staying up-to-date</strong> – The frontend technologies are changing almost everyday, so it’s very necessary to stay up-to-date, you got to keep an eye on the stuffs happening around JavaScript, HTML 5, CSS3 and other best practices, which will help you gather information and knowledge upfront, which you can later use in your work.</li>
+<li><strong>Communication and co-ordination</strong> – Last but not the least, this is a very important job that a frontend engineer has to do everyday with his peers, managers and creative designers. He/she has to communicate well in terms of what can be possible in the browser, how changing something can improve or degrade accessibility or performance. I have seen designers often like to design interfaces by pouring every bit of their creativity and aesthetic sense, which is a good thing definitely, but in a real world implementing those interfaces using HTML/CSS is sometimes impossible, hence it is the frontend engineer who should actually communicate with the designers about what can be done and what can not. In some cases he/she often has to push back some features which might introduce too much complexity or impact the performance of the application as a whole, and while doing so I would expect that a good frontend engineer to come out with alternate solutions in a constructive way. As frontend engineers sit somewhere between middle-tier, creative and product management, so their efforts are directly related with these people, communicating and coordinating properly will definitely serve well.</li>
+</ul>
+
+
+<p>Well if you want to be a frontend engineer make sure that you know stuff I mentioned above, these are just the beginning by the way, there are a lot of things that you will learn eventually, but don’t forget to make sure that your base is strong, do a lot of practice, ask questions, read articles and blogs and finally think like a frontend engineer. All the best.</p>
+
+<p><em>Disclaimer: The use of the word ‘engineer’ is not meant to do anything with ‘Engineering discipline’ at all, I know traditional engineers do a lot of hard work to achieve that academic qualification, as working in Frontend also involves similar amount of hard work that’s why the term has been used here to refer the collective effort of these hard-working people.</em></p>
 ]]></content>
   </entry>
   
