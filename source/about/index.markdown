@@ -23,7 +23,7 @@ I am proficient in the following list of technologies and programming languages 
 ## Contact
 * Email: arnabc [at] webgyani.com
 * Twitter: [arnabc](http://twitter.com/arnabc)
-* LinkedIn: [webgyani](http://linkedin.com/in/webgyani)
+* LinkedIn: [arnabchakraborty1](http://www.linkedin.com/in/arnabchakraborty1)
 * Github: [arnabc](http://github.com/arnabc)
 
 

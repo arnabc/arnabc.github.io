@@ -89,6 +89,6 @@ Once the download sync is complete, the app sends an Intent notifying the Main h
 
 This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing **Android Push Messaging (C2DM)**, this we'll do sometime in later months, and as we already have the provisioning server in place then it's just a matter of time that we develop the feaures and push it to the wild.
 
-On a closing note, if you want to build an app like this, then you can get in touch with us at <biz@quadnode.com>, we'd be happy to help you.
+On a closing note, if you want to build an app like this, then you can get in touch with me at <arnabc@webgyani.com>, I'd be happy to help you.
 
 Thanks for reading!
