@@ -318,7 +318,7 @@ mRequestQueue.cancelAll("My Tag");
 As per the ApplicationController class shown above, this is how you'll cancel the requests:
 
 {% codeblock lang:java %}
-ApplicationController.getInstance().addToRequestQueue(request, "My Tag");
+ApplicationController.getInstance().cancelPendingRequests("My Tag");
 {% endcodeblock %}
 
 
