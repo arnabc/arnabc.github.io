@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-12-20T11:24:55+05:30</updated>
+  <updated>2013-12-20T11:28:38+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -651,7 +651,7 @@
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setRetryPolicy</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultRetryPolicy</span><span class="o">(</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mf">1.0f</span><span class="o">));</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommends.</p>
+<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommend.</p>
 
 <h3>Setting Request Headers (HTTP headers)</h3>
 
@@ -1967,7 +1967,7 @@ config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#97;&#114;&#x6e;&#97;&#98;&#99;&#64;&#119;&#101;&#98;&#x67;&#x79;&#x61;&#x6e;&#105;&#x2e;&#x63;&#x6f;&#109;">&#97;&#x72;&#110;&#97;&#98;&#x63;&#x40;&#x77;&#101;&#x62;&#x67;&#x79;&#x61;&#x6e;&#x69;&#46;&#x63;&#x6f;&#109;</a>, I&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#97;&#114;&#110;&#x61;&#x62;&#x63;&#64;&#119;&#x65;&#x62;&#103;&#x79;&#97;&#110;&#105;&#46;&#99;&#x6f;&#x6d;">&#x61;&#114;&#110;&#x61;&#x62;&#x63;&#x40;&#119;&#x65;&#x62;&#x67;&#121;&#x61;&#110;&#x69;&#46;&#x63;&#111;&#109;</a>, I&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Volley | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/volley/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-12-20T11:24:55+05:30</updated>
+  <updated>2013-12-20T11:28:38+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -561,7 +561,7 @@
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setRetryPolicy</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultRetryPolicy</span><span class="o">(</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mf">1.0f</span><span class="o">));</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommends.</p>
+<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommend.</p>
 
 <h3>Setting Request Headers (HTTP headers)</h3>
 
