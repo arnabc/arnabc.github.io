@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Volley | Arnab Chakraborty]]></title>
   <link href="http://arnab.ch/blog/categories/volley/atom.xml" rel="self"/>
   <link href="http://arnab.ch/"/>
-  <updated>2013-12-12T15:39:21+05:30</updated>
+  <updated>2013-12-20T11:24:55+05:30</updated>
   <id>http://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
@@ -549,7 +549,7 @@
 <p>As per the ApplicationController class shown above, this is how you&rsquo;ll cancel the requests:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">cancelPendingRequests</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <h3>Retrying failed requests and customizing request Timeout</h3>
