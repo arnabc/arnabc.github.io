@@ -330,7 +330,7 @@ There is no direct way to specify request timeout value in Volley, but there is 
 request.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 1, 1.0f));
 {% endcodeblock %}
 
-If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement "exponential backoff" that some RESTful services recommends.
+If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement "exponential backoff" that some RESTful services recommend.
 
 
 ### Setting Request Headers (HTTP headers)
