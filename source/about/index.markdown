@@ -5,15 +5,15 @@ date: 2013-06-24 14:46
 footer: true
 ---
 
-I am an Android, JavaScript and Ruby developer living in India. I grew up near the hills of majestic Darjeeling and graduated from North Bengal University with a degree in English Literature. I currently work at **QuadNode Technologies** India which I co-founded in 2011.
+I am an Android, JavaScript and Ruby developer living in India. I grew up near the hills of majestic Darjeeling and graduated from North Bengal University. I currently work at **[ProMobi Technologies](http://promobitech.com "ProMobi Technologies")** India which I co-founded in 2014.
 
-I am a self-learner and learnt most of my programming skills by myself. Personally I value and admire quality code, clean user interface and beautiful typography. These days I mainly focus on DevOps, performance optimization and application security.
+I am a self-learner and learnt most of my programming skills by myself. Personally I value and admire quality code, clean user interface and beautiful typography. These days I mainly focus on Android, DevOps and application security.
 
 Last but not the least, as a technologist my aim is to build something useful which will have a positive impact on people's lives. I currently live in Pune, India with my beautiful wife Sarmistha.
 
 
 ## Consulting
-I am proficient in the following list of technologies and programming languages and also available for _short-term consulting work_ in one of these:
+I am proficient in the following list of technologies and programming languages and also available for consulting work in one of these:
 
 * Android
 * JavaScript and HTML5
