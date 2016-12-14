@@ -92,3 +92,8 @@ This project has helped us gain a lot of valuable knowledge and insight into the
 On a closing note, if you want to build an app like this, then you can get in touch with me at <arnabc@webgyani.com>, I'd be happy to help you.
 
 Thanks for reading!
+
+
+---
+Note: I have developed a generic Kiosk Management Solution called [MobiLock Pro](https://mobilock.in) which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out **MobiLock Pro**.
+---
