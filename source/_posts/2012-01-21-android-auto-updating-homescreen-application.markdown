@@ -95,5 +95,4 @@ Thanks for reading!
 
 
 ---
-Note: I have developed a generic Kiosk Management Solution called [MobiLock Pro](https://mobilock.in) which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out **MobiLock Pro**.
----
+**Note: I have developed a generic Kiosk Management Solution called [MobiLock Pro](https://mobilock.in) which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out MobiLock Pro.**
