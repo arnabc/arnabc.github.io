@@ -1,0 +1,1986 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Android | Arnab Chakraborty]]></title>
+  <link href="http://arnabc.github.io/blog/categories/android/atom.xml" rel="self"/>
+  <link href="http://arnabc.github.io/"/>
+  <updated>2016-12-14T20:53:08+05:30</updated>
+  <id>http://arnabc.github.io/</id>
+  <author>
+    <name><![CDATA[Arnab Chakraborty]]></name>
+    <email><![CDATA[arnabc@webgyani.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
+    <link href="http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
+    <updated>2013-11-17T11:40:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
+    <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges you&rsquo;ll face while developing these type of applications. This is a high-level overview of the effort involved, and not meant to provide code examples which will be beyond the scope of the post.</p>
+
+<!--more-->
+
+
+<h2>General requirements for such applications</h2>
+
+<ul>
+<li>Only one app is allowed to run.</li>
+<li>Only whitelisted contacts are allowed to be contacted (via Phone or SMS)</li>
+<li>Only whitelisted apps are allowed to be used.</li>
+<li>Tracking which applications are installed or uninstalled.</li>
+<li>Disable status bar.</li>
+</ul>
+
+
+<h2>Things to consider before developing the app</h2>
+
+<ul>
+<li>Developing for the masses? Will it be distributed through the Play store ? Not a good use case for Kiosk mode applications IMHO don&rsquo;t do it, users don&rsquo;t like it when you take over their phone and don&rsquo;t allow them to use the phone freely. Might work for a very specific niche for example a mounted Tablet in a restaurant which displays today&rsquo;s menus and recipes.</li>
+<li>If you are developing it for controlled distribution, not through the Play store, then finalize the type of devices which will be used to distribute your app. Most common scenario is that it will be a cheap Chinese tablet running either Android 4.0+. Get familiar with the device first, figure out how many hardware keys are there and which ones you need to block or modify.</li>
+<li>Savvy users can bypass your restrictions if the devices are not physically secured. Although nothing in this world is completely secure so always watch out for surprises.</li>
+</ul>
+
+
+<p><strong>My focus on this post will be controlled distribution where you as a developer have physical control over the devices.</strong></p>
+
+<h2>Approaches for developing Kiosk Mode applications</h2>
+
+<p>Following are the two approaches that you can take depending on your expertise and skill.</p>
+
+<ul>
+<li>Developing as a Launcher application</li>
+<li>Building a custom ROM</li>
+</ul>
+
+
+<h2>Developing as a Launcher Application</h2>
+
+<p>This approach is the easiest one that you can take, developing a Launcher application is fairly simple and you can quickly get going without much of a trouble. Let me roughly list out the items which you need to do:</p>
+
+<h4>Only your app is allowed to run always</h4>
+
+<p>As mentioned above make it a Launcher app and ensure that it is the default launcher app, after installation you can disable the old launcher app using <code>pm disable &lt;PACKAGE_OR_COMPONENT&gt;</code> command. Now as your launcher app is the default one so it will be started automatically on boot, nothing fancy here.</p>
+
+<h4>Detect when new applications are opened</h4>
+
+<p>In order to enforce control, you may need to detect when a new application is opened to figure out whether it is an allowed application or not. There are two ways that you can go about it:</p>
+
+<ul>
+<li>Run a repeated alarm, for example every 5 seconds and retrieve the topmost activity from the currently running applications and and see if that package is allowed to run if not then bring your home screen in the foreground and use <code>ActivityManager.killBackgroundProcess()</code> to kill that app (will not work for system apps though). There are caveats to this approach, it is heavy on resources and drains battery very quickly.</li>
+<li>Use <strong>AccessibilityService</strong> and it lets you know when a new application window is opened and then you can check which application is currently running and act accordingly. This is on demand and is not heavy on resources. The caveat is that you have to manually enable the service from <code>Settings --&gt; Accessibility</code>. Assuming physical control over the devices, so this should not be an issue, but it&rsquo;s manual and that&rsquo;s the downside.</li>
+</ul>
+
+
+<h4>Detect if new applications are installed or uninstalled</h4>
+
+<p>Android provides broadcast receivers for you to track when a new application is installed or uninstalled. Use them and log the activities accordingly.</p>
+
+<h4>Disable status bar</h4>
+
+<p>You cannot override the status bar,  so the only option is to run a background service and create a opaque overlay view and position it on top of the status bar, this status bar should consume all touch events (this is how custom status bar replacements apps work I think), you&rsquo;ll need <code>android.permission.SYSTEM_ALERT_WINDOW</code> permission to put your view on top of all other windows. Also you can make your Launcher app fullscreen as well.</p>
+
+<h4>Make your app a Device Administrator</h4>
+
+<p>Take advantage of Device Administrator features, this will provide some elevated access rights to perform administrative tasks, like remotely lock screen, wipe out the data etc.</p>
+
+<h4>Automatic Update</h4>
+
+<p>If you need automatic update support but don&rsquo;t want to distribute your app through Play Store, then you need to &ldquo;<strong>root</strong>&rdquo; the device and run a separate app which will update your app when there is a new version. This requires you to build a backend as well. I wrote a blog post on this topic some time ago, <a href="/blog/2012/01/android-auto-updating-homescreen-application/">Android auto-updating homescreen application</a>.</p>
+
+<h2>Building a custom ROM</h2>
+
+<p>This is by far the most preferable and a reliable approach. You can create your custom build right out of AOSP source code, but based on your device you will need some proprietary files. Take a look at the AOKP/CynogenMod for custom ROMS for your device.</p>
+
+<p>Building custom ROM is bit difficult as it will take you some time to fully grok the process but once you&rsquo;re through with this, then it will be alright. I suggest you try building a custom ROM from vanilla AOSP source and test it in Emulator using Virtual Device. It will also be a very good learning exercise for you.</p>
+
+<p>You need to build your own backend infrastructure for distribution and remote management.</p>
+
+<h2>Conclusion</h2>
+
+<p>Developing kiosk based applications are difficult but not impossible, the problem begins when you start to control the device&rsquo;s default functions, if you see that you need to completely lock-down a device then it is wiser that you go down the custom ROM path instead of trying to make it work in consumer grade Android phones.</p>
+
+<hr />
+
+<h2>Note: I have developed a generic Kiosk Management Solution called <a href="https://mobilock.in">MobiLock Pro</a> which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out <strong>MobiLock Pro</strong>.</h2>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
+    <link href="http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
+    <updated>2013-08-21T22:24:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
+    <content type="html"><![CDATA[<p>Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster. The good thing about Volley is that it abstracts away the low level details of what HTTP client library is being used under the hood and helps you focus on writing nice and clean RESTful HTTP requests. Additionally all requests in Volley are executed asynchronously on a different thread without blocking your &ldquo;main thread&rdquo;.</p>
+
+<!-- more -->
+
+
+<h2>What are the features that Volley provides?</h2>
+
+<p>Important features of the Volley library:</p>
+
+<ul>
+<li>A high level API to make asynchronous RESTful HTTP requests</li>
+<li>An elegant and robust Request queue</li>
+<li>An extensible architecture which allows developers to implement custom request and response handling mechanism</li>
+<li>Ability to use external HTTP client library</li>
+<li>Robust request caching policy</li>
+<li>Custom views to load and cache images from Network (<code>NetworkImageView</code>, <code>ImageLoader</code> etc)</li>
+</ul>
+
+
+<h2>Why use asynchronous HTTP requests?</h2>
+
+<p>In Android it is always a good practice to make HTTP requests asynchronously, in fact from HoneyComb onwards it is no longer just a &ldquo;good practice&rdquo;, you must make HTTP requests asynchronously off the main thread or else you&rsquo;ll get this nasty exception <code>android.os.NetworkOnMainThreadException</code>. Blocking the main thread has some serious consequences, it hampers UI rendering, harmful to smooth user experience and above all it can cause dreaded ANR (Application Not Responding). To avoid all these pitfalls you as a developer should always ensure that your HTTP requests are on a different thread.</p>
+
+<h2>How to use Volley</h2>
+
+<p>We are going to cover the following items in this blog post, by the end of it you should be able to have a clear understanding of Volley and how to use it in your application.</p>
+
+<ul>
+<li>Installing and using Volley as a library project</li>
+<li>Using Request Queue</li>
+<li>Making asynchronous JSON and String HTTP requests</li>
+<li>Cancelling requests</li>
+<li>Retrying failed requests, customizing request Timeout</li>
+<li>Setting Request Headers (HTTP headers)</li>
+<li>Using cookies</li>
+<li>Error Handling</li>
+</ul>
+
+
+<h3>Installing and using Volley as a library project</h3>
+
+<p>Volley is part of AOSP and right now it is not being distributed as a JAR, the easiest way to include Volley to your project is to clone the Volley repository and set it as a library project.</p>
+
+<h4>Using as a library project</h4>
+
+<p>Git clone the repository using the following command and then import it as Android library project:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>git clone &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;https://android.googlesource.com/platform/frameworks/volley&quot;</span>&gt;https://android.googlesource.com/platform/frameworks/volley&lt;/a&gt;
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h4>Using as a JAR</h4>
+
+<p>Clone the repository as shown above and then run the following commands to export it as JAR and after that add the JAR file to your project&rsquo;s <code>/libs</code> folder:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;in Volley project root <span class="o">(</span>ensure the &lt;code&gt;android&lt;/code&gt; executable is in your path<span class="o">)</span>&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>android update project -p .&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;the following <span class="nb">command </span>will create a JAR file and put it in ./bin&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="nv">$ </span>ant jar
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Using Request Queue</h3>
+
+<p>All requests in Volley are placed in a queue first and then processed, here is how you will be creating a request queue:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>RequestQueue </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">RequestQueue</span> <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="k">this</span><span class="o">);</span> <span class="c1">// &amp;lsquo;this&amp;rsquo; is Context</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Ideally you should have one centralized place for your Queue, and the best place to initialize queue is in your <a href="http://developer.android.com/reference/android/app/Application.html">Application</a> class. Here is how this can be done:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>ApplicationController.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApplicationController</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Log or request TAG</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s">&quot;VolleyPatterns&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Global request queue for Volley</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">RequestQueue</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * A singleton instance of the application class for easy access in other places</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">ApplicationController</span> <span class="n">sInstance</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// initialize the singleton</span>
+</span><span class='line'>    <span class="n">sInstance</span> <span class="o">=</span> <span class="k">this</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * @return ApplicationController singleton instance</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">ApplicationController</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">sInstance</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * @return The Volley Request queue, the queue will be created if it is null</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">RequestQueue</span> <span class="nf">getRequestQueue</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// lazy initialize the request queue, the queue instance will be</span>
+</span><span class='line'>    <span class="c1">// created when it is accessed for the first time</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="n">getApplicationContext</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Adds the specified request to the global queue, if tag is specified</span>
+</span><span class='line'><span class="cm"> * then it is used else Default TAG is used.</span>
+</span><span class='line'><span class="cm"> * </span>
+</span><span class='line'><span class="cm"> * @param req</span>
+</span><span class='line'><span class="cm"> * @param tag</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="kt">void</span> <span class="n">addToRequestQueue</span><span class="o">(</span><span class="n">Request</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">req</span><span class="o">,</span> <span class="n">String</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// set the default tag if tag is empty</span>
+</span><span class='line'>    <span class="n">req</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">TextUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">tag</span><span class="o">)</span> <span class="o">?</span> <span class="n">TAG</span> <span class="o">:</span> <span class="n">tag</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">VolleyLog</span><span class="o">.</span><span class="na">d</span><span class="o">(</span><span class="s">&quot;Adding request to queue: %s&quot;</span><span class="o">,</span> <span class="n">req</span><span class="o">.</span><span class="na">getUrl</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">getRequestQueue</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Adds the specified request to the global queue using the Default TAG.</span>
+</span><span class='line'><span class="cm"> * </span>
+</span><span class='line'><span class="cm"> * @param req</span>
+</span><span class='line'><span class="cm"> * @param tag</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="kt">void</span> <span class="n">addToRequestQueue</span><span class="o">(</span><span class="n">Request</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">T</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">req</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// set the default tag if tag is empty</span>
+</span><span class='line'>    <span class="n">req</span><span class="o">.</span><span class="na">setTag</span><span class="o">(</span><span class="n">TAG</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">getRequestQueue</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Cancels all pending requests by the specified TAG, it is important</span>
+</span><span class='line'><span class="cm"> * to specify a TAG so that the pending/ongoing requests can be cancelled.</span>
+</span><span class='line'><span class="cm"> * </span>
+</span><span class='line'><span class="cm"> * @param tag</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">cancelPendingRequests</span><span class="o">(</span><span class="n">Object</span> <span class="n">tag</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">mRequestQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(</span><span class="n">tag</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Making asynchronous HTTP requests</h3>
+
+<p>Volley provides the following utility classes which you can use to make asynchronous HTTP requests:</p>
+
+<ul>
+<li><a href="http://goo.gl/CRMvRj">JsonObjectRequest</a> &mdash; To send and receive JSON Object from the Server</li>
+<li><a href="http://goo.gl/F02Ew3">JsonArrayRequest</a> &mdash; To receive JSON Array from the Server</li>
+<li><a href="http://goo.gl/c5DB8p">StringRequest</a> &mdash; To retrieve response body as String (ideally if you intend to parse the response by yourself)</li>
+</ul>
+
+
+<p><em>Note:</em> To send parameters in request body you need to override either <code>getParams()</code> or <code>getBody()</code> method of the request classes (as required) described below.</p>
+
+<h4>JsonObjectRequest</h4>
+
+<p>This class can be used to send and receive JSON object. An overloaded constructor of this class allows to set appropriate request method (DELETE, GET, POST and PUT). This is the class which you should be using frequently if you are working with a RESTful backend. The following examples show how to make GET and POST requests.</p>
+
+<p>Using HTTP GET method:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>JsonObjectRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">volley</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="mi">12</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;;</span>
+</span><span class='line'><span class="c1">// pass second argument as &amp;ldquo;null&amp;rdquo; for GET requests</span>
+</span><span class='line'><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="kc">null</span><span class="o">,&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>     <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">JSONObject</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>         <span class="nd">@Override</span>
+</span><span class='line'>         <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>             <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                 <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>             <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                 <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>             <span class="o">}</span>
+</span><span class='line'>         <span class="o">}</span>
+</span><span class='line'>     <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>         <span class="nd">@Override</span>
+</span><span class='line'>         <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>             <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>         <span class="o">}</span>
+</span><span class='line'>     <span class="o">});</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Using HTTP POST method:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>JsonObjectRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">volley</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="mi">12</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;;</span>
+</span><span class='line'><span class="c1">// Post params to be sent to the server</span>
+</span><span class='line'><span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">params</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="n">params</span><span class="o">.</span><span class="na">put</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">token</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">AbCdEfGh123456</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">(</span><span class="n">params</span><span class="o">),&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>     <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">JSONObject</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>         <span class="nd">@Override</span>
+</span><span class='line'>         <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>             <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                 <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>             <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                 <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>             <span class="o">}</span>
+</span><span class='line'>         <span class="o">}</span>
+</span><span class='line'>     <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>         <span class="nd">@Override</span>
+</span><span class='line'>         <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>             <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>         <span class="o">}</span>
+</span><span class='line'>     <span class="o">});</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h4>JsonArrayRequest</h4>
+
+<p>This class can be used to retrieve <strong>JSON array</strong> but not <strong>JSON object</strong> and only HTTP GET is supported as of now. As it supports only GET, so if you are to specify some querystring parameters then append those in the URL itself. The constructor does not accept request parameters.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>JsonArrayRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">volley</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="n">all</span><span class="o">?</span><span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;;</span>
+</span><span class='line'><span class="n">JsonArrayRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonArrayRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">JSONArray</span><span class="o">&gt;</span> <span class="o">()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONArray</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="mi">4</span><span class="o">));</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JSONException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;});&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h4>StringRequest</h4>
+
+<p>This class can be used to retrieve the response from server as String, ideally you should use this class when you intend to parse the response by yourself, e.g. if it is XML. It also provides overloaded constructors to further customize your request.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>StringRequest </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">final</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;/</span><span class="n">volley</span><span class="o">/</span><span class="n">resource</span><span class="o">/</span><span class="n">recent</span><span class="o">.</span><span class="na">xml</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;;</span>
+</span><span class='line'><span class="n">StringRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">String</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">VolleyLog</span><span class="o">.</span><span class="na">v</span><span class="o">(</span><span class="s">&quot;Response:%n %s&quot;</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">VolleyLog</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">&quot;Error: &quot;</span><span class="o">,</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;});&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the request object to the queue to be executed</span>
+</span><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Setting a priority to the request is possible, this may be desirable in some cases where you want to move certain requests higher up in the order. The requests are processed from higher priorities to lower priorities, in FIFO order. To set a priority you need to override the <code>getPriority()</code> method of the request class. The current available priorities are &ndash; <code>Priority.LOW</code>, <code>Priority.NORMAL</code>, <code>Priority.HIGH</code> and <code>Priority.IMMEDIATE</code>.</p>
+
+<h3>Cancelling requests</h3>
+
+<p>Volley provides powerful APIs to cancel pending or ongoing requests, one reason when you need to do this is if user rotates his device while a request is ongoing you need to cancel that because the Activity is going be restarted. The easiest way to cancel a request is to call the <code>cancelAll(tag)</code> method of the request queue, this will only work if you have set a <strong>tag on the request object</strong> before adding it to the queue. The ability to tag requests allows you to cancel all pending requests for that tag in one method call.</p>
+
+<p>Adding a request to the queue using a tag:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setTag</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>As per the ApplicationController class shown above, this is how you&rsquo;ll add the request to the queue:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">addToRequestQueue</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Cancelling all requests with the specified tag:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">mRequestQueue</span><span class="o">.</span><span class="na">cancelAll</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>As per the ApplicationController class shown above, this is how you&rsquo;ll cancel the requests:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">ApplicationController</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span><span class="na">cancelPendingRequests</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">My</span> <span class="n">Tag</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Retrying failed requests and customizing request Timeout</h3>
+
+<p>There is no direct way to specify request timeout value in Volley, but there is a workaround, you need to set a RetryPolicy on the request object. The <code>DefaultRetryPolicy</code> class takes an argument called <em>initialTimeout</em>, this can be used to specify a request timeout, make sure the maximum retry count is 1 so that volley does not retry the request after the timeout has been exceeded.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Setting Request Timeout </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">setRetryPolicy</span><span class="o">(</span><span class="k">new</span> <span class="n">DefaultRetryPolicy</span><span class="o">(</span><span class="mi">20</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mf">1.0f</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>If you want to retry failed requests (due to timeout) you can specify that too using the code above, just increase the retry count. Note the last argument, it allows you to specify a backoff multiplier which can be used to implement &ldquo;exponential backoff&rdquo; that some RESTful services recommend.</p>
+
+<h3>Setting Request Headers (HTTP headers)</h3>
+
+<p>Sometimes it is necessary to add extra headers to the HTTP requests, one common case is to add an &ldquo;Authorization&rdquo; header for HTTP Basic Auth. Volley Request class provides a method called <code>getHeaders()</code> which you need to override to add your custom headers if necessary.</p>
+
+<p>Adding custom headers:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">JsonObjectRequest</span> <span class="n">req</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonObjectRequest</span><span class="o">(</span><span class="n">URL</span><span class="o">,</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">(</span><span class="n">params</span><span class="o">),&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span>       <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">Listener</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">JSONObject</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onResponse</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="c1">// handle response</span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">},</span> <span class="k">new</span> <span class="n">Response</span><span class="o">.</span><span class="na">ErrorListener</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>           <span class="nd">@Override</span>
+</span><span class='line'>           <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onErrorResponse</span><span class="o">(</span><span class="n">VolleyError</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>               <span class="c1">// handle error                        </span>
+</span><span class='line'>           <span class="o">}</span>
+</span><span class='line'>       <span class="o">})</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">getHeaders</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">AuthFailureError</span> <span class="o">{</span>
+</span><span class='line'>       <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;();</span>
+</span><span class='line'>       <span class="n">headers</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;CUSTOM_HEADER&quot;</span><span class="o">,</span> <span class="s">&quot;Yahoo&quot;</span><span class="o">);</span>
+</span><span class='line'>       <span class="n">headers</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;ANOTHER_CUSTOM_HEADER&quot;</span><span class="o">,</span> <span class="s">&quot;Google&quot;</span><span class="o">);</span>
+</span><span class='line'>       <span class="k">return</span> <span class="n">headers</span><span class="o">;</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>   <span class="o">};</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Using cookies</h3>
+
+<p>There is no direct API through which you can set cookies in Volley. This makes sense because the core philosophy of Volley is to provide clean APIs to write RESTful HTTP requests, these days most of the  RESTful API providers prefer authentication tokens instead of cookies. Using cookies in Volley is a bit more involed process and not very straight forward.</p>
+
+<p>Here is a modified version of the <code>getRequestQueue()</code> method of our ApplicationController class shown above, also contains the rough code required to set a cookie:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// http client instance</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">DefaultHttpClient</span> <span class="n">mHttpClient</span><span class="o">;</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">RequestQueue</span> <span class="nf">getRequestQueue</span><span class="o">()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c1">// lazy initialize the request queue, the queue instance will be</span>
+</span><span class='line'><span class="c1">// created when it is accessed for the first time</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">mRequestQueue</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Create an instance of the Http client. </span>
+</span><span class='line'>    <span class="c1">// We need this in order to access the cookie store</span>
+</span><span class='line'>    <span class="n">mHttpClient</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DefaultHttpClient</span><span class="o">();</span>
+</span><span class='line'>    <span class="c1">// create the request queue</span>
+</span><span class='line'>    <span class="n">mRequestQueue</span> <span class="o">=</span> <span class="n">Volley</span><span class="o">.</span><span class="na">newRequestQueue</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="k">new</span> <span class="n">HttpClientStack</span><span class="o">(</span><span class="n">mHttpClient</span><span class="o">));</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="k">return</span> <span class="n">mRequestQueue</span><span class="o">;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;/&lt;</span><span class="n">em</span><span class="o">&gt;*</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Method</span> <span class="n">to</span> <span class="n">set</span> <span class="n">a</span> <span class="n">cookie</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setCookie</span><span class="o">()</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">CookieStore</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">mHttpClient</span><span class="o">.</span><span class="na">getCookieStore</span><span class="o">();</span>
+</span><span class='line'><span class="c1">// create a cookie</span>
+</span><span class='line'><span class="n">cs</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="k">new</span> <span class="n">BasicClientCookie2</span><span class="o">(</span><span class="s">&quot;cookie&quot;</span><span class="o">,</span> <span class="s">&quot;spooky&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the cookie before adding the request to the queue</span>
+</span><span class='line'><span class="n">setCookie</span><span class="o">();&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c1">// add the request to the queue</span>
+</span><span class='line'><span class="n">mRequestQueue</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">request</span><span class="o">);&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h3>Error Handling</h3>
+
+<p>As you have seen in the above code examples when you create a request object in Volley you need to specify  an error listener, Volley invokes the <code>onErrorResponse</code> callback method of that listener passing an instance of the <code>VolleyError</code> object when there is an error while performing the request.</p>
+
+<p>The following is the list of exceptions in Volley:</p>
+
+<ul>
+<li><strong>AuthFailureError</strong> &mdash; If you are trying to do Http Basic authentication then this error is most likely to come.</li>
+<li><strong>NetworkError</strong> &mdash; Socket disconnection, server down, DNS issues might result in this error.</li>
+<li><strong>NoConnectionError</strong> &mdash; Similar to NetworkError, but fires when device does not have internet connection, your error handling logic can club <code>NetworkError</code> and <code>NoConnectionError</code> together and treat them similarly.</li>
+<li><strong>ParseError</strong> &mdash; While using <code>JsonObjectRequest</code> or <code>JsonArrayRequest</code> if the received JSON is malformed then this exception will be generated. If you get this error then it is a problem that should be fixed instead of being handled.</li>
+<li><strong>ServerError</strong> &mdash; The server responded with an error, most likely with <em>4xx</em> or <em>5xx</em> HTTP status codes.</li>
+<li><strong>TimeoutError</strong> &mdash; Socket timeout, either server is too busy to handle the request or there is some network latency issue. By default Volley times out the request after <strong>2.5 seconds</strong>, use a RetryPolicy if you are consistently getting this error.</li>
+</ul>
+
+
+<p>You can use a simple helper like the following to display appropriate message when one of these exceptions occurs:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>VolleyErrorHelper.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">VolleyErrorHelper</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span> <span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Returns appropriate message which is to be displayed to the user </span>
+</span><span class='line'><span class="cm"> * against the specified error object.</span>
+</span><span class='line'><span class="cm"> * </span>
+</span><span class='line'><span class="cm"> * @param error</span>
+</span><span class='line'><span class="cm"> * @param context</span>
+</span><span class='line'><span class="cm"> * @return</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getMessage</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">TimeoutError</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_server_down</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">isServerProblem</span><span class="o">(</span><span class="n">error</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nf">handleServerError</span><span class="o">(</span><span class="n">error</span><span class="o">,</span> <span class="n">context</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">isNetworkProblem</span><span class="o">(</span><span class="n">error</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">no_internet</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_error</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Determines whether the error is related to network</span>
+</span><span class='line'><span class="cm"> * @param error</span>
+</span><span class='line'><span class="cm"> * @return</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isNetworkProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NetworkError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">NoConnectionError</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Determines whether the error is related to server</span>
+</span><span class='line'><span class="cm"> * @param error</span>
+</span><span class='line'><span class="cm"> * @return</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isServerProblem</span><span class="o">(</span><span class="n">Object</span> <span class="n">error</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">ServerError</span><span class="o">)</span> <span class="o">||</span> <span class="o">(</span><span class="n">error</span> <span class="k">instanceof</span> <span class="n">AuthFailureError</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Handles the server error, tries to determine whether to show a stock message or to </span>
+</span><span class='line'><span class="cm"> * show a message retrieved from the server.</span>
+</span><span class='line'><span class="cm"> * </span>
+</span><span class='line'><span class="cm"> * @param err</span>
+</span><span class='line'><span class="cm"> * @param context</span>
+</span><span class='line'><span class="cm"> * @return</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">handleServerError</span><span class="o">(</span><span class="n">Object</span> <span class="n">err</span><span class="o">,</span> <span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">VolleyError</span> <span class="n">error</span> <span class="o">=</span> <span class="o">(</span><span class="n">VolleyError</span><span class="o">)</span> <span class="n">err</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">NetworkResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="na">networkResponse</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">response</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">switch</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">statusCode</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">404</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">422</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">case</span> <span class="mi">401</span><span class="o">:</span>
+</span><span class='line'>            <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>                  <span class="c1">// server might return error like this { &quot;error&quot;: &quot;Some error occured&quot; }</span>
+</span><span class='line'>                  <span class="c1">// Use &quot;Gson&quot; to parse the result</span>
+</span><span class='line'>                <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Gson</span><span class="o">().</span><span class="na">fromJson</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">data</span><span class="o">),</span>
+</span><span class='line'>                        <span class="k">new</span> <span class="n">TypeToken</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Map</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>                        <span class="o">}.</span><span class="na">getType</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>                <span class="k">if</span> <span class="o">(</span><span class="n">result</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;</span><span class="n">amp</span><span class="o">;&amp;</span><span class="n">amp</span><span class="o">;</span> <span class="n">result</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>                    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;error&quot;</span><span class="o">);</span>
+</span><span class='line'>                <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>            <span class="c1">// invalid request</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">error</span><span class="o">.</span><span class="na">getMessage</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>            <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_server_down</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">().</span><span class="na">getString</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">string</span><span class="o">.</span><span class="na">generic_error</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h2>Conclusion</h2>
+
+<p>Volley is really a nice library and you should seriously consider giving this a try. It will help you simplify your network requests and also add a ton of additional benefits.</p>
+
+<p>I understand that it&rsquo;s a tl;dr post, actually I tried to be as comprehensive as possible, I am planning to come up with another post about image loading using Volley and some gotchas that I noticed while using the library in one of my projects, till then stay tuned.</p>
+
+<p>Thanks for reading, I hope you enjoyed this :&ndash;)</p>
+
+<h2>References</h2>
+
+<ul>
+<li>NetworkOnMainThreadException &mdash; <a href="http://developer.android.com/reference/android/os/NetworkOnMainThreadException.html">http://developer.android.com/reference/android/os/NetworkOnMainThreadException.html</a></li>
+<li>Application &mdash; <a href="http://developer.android.com/reference/android/app/Application.html">http://developer.android.com/reference/android/app/Application.html</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
+    <link href="http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
+    <updated>2013-08-16T14:54:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
+    <content type="html"><![CDATA[<p>In Android the screen that appears when the phone starts is called &ldquo;Launcher Screen&rdquo;. It is possible in Android to write custom launcher apps which can be used as a replacement for the default launcher app that comes bundled with the phone. Developing a launcher app is no different than developing any other Android application, in fact both are same. In this post I&rsquo;ll share what you need to do to write your own custom launcher application.</p>
+
+<!-- more -->
+
+
+<h2>AndroidManifest.xml</h2>
+
+<p>I&rsquo;ll skip the part of creating the project and drive straight to the code. Here is our sample <code>AndroidManifest.xml</code> file, remember to pay attention to the comments in the code.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AndroidManifest.xml </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span><span class="ni">&amp;lt;</span>?xml version=<span class="ni">&amp;ldquo;</span>1.0<span class="ni">&amp;rdquo;</span> encoding=<span class="ni">&amp;ldquo;</span>utf-8<span class="ni">&amp;rdquo;</span>?&gt;
+</span><span class='line'><span class="ni">&amp;lt;</span>manifest xmlns:android=<span class="ni">&amp;ldquo;</span><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>http://schemas.android.com/apk/res/android<span class="nt">&lt;/a&gt;</span><span class="ni">&amp;rdquo;</span><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;pre&gt;&lt;code&gt;</span>package=&quot;ch.arnab.simplelauncher&quot;
+</span><span class='line'>android:versionCode=&quot;1&quot;
+</span><span class='line'>android:versionName=&quot;1.0&quot; <span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>uses-sdk
+</span><span class='line'>    android:minSdkVersion=&quot;8&quot;
+</span><span class='line'>    android:targetSdkVersion=&quot;16&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>application
+</span><span class='line'>    android:launchMode=&quot;singleTask&quot;
+</span><span class='line'>    android:clearTaskOnLaunch=&quot;true&quot;
+</span><span class='line'>    android:stateNotNeeded=&quot;true&quot;
+</span><span class='line'>    android:icon=&quot;@drawable/ic_launcher&quot;
+</span><span class='line'>    android:label=&quot;@string/app_name&quot;
+</span><span class='line'>    android:theme=&quot;@style/AppTheme&quot; <span class="ni">&amp;gt;</span>
+</span><span class='line'>    <span class="ni">&amp;lt;</span>activity
+</span><span class='line'>        android:name=&quot;ch.arnab.simplelauncher.HomeScreen&quot;
+</span><span class='line'>        android:label=&quot;@string/app_name&quot;
+</span><span class='line'>        android:launchMode=&quot;singleTask&quot;
+</span><span class='line'>        android:excludeFromRecents=&quot;true&quot;
+</span><span class='line'>        android:screenOrientation=&quot;nosensor&quot;<span class="ni">&amp;gt;</span>
+</span><span class='line'>        <span class="ni">&amp;lt;</span>intent-filter<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>action android:name=&quot;android.intent.action.MAIN&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>!-- The following two intent-filters are the key to set homescreen --<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>category android:name=&quot;android.intent.category.HOME&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>            <span class="ni">&amp;lt;</span>category android:name=&quot;android.intent.category.DEFAULT&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="ni">&amp;lt;</span>/intent-filter<span class="ni">&amp;gt;</span>
+</span><span class='line'>    <span class="ni">&amp;lt;</span>/activity<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="ni">&amp;lt;</span>/application<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="nt">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;/manifest&gt;&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The important line in the above <em>XML</em> file is <code>&lt;category android:name="android.intent.category.HOME" /&gt;</code>, this <code>intent-filter</code> allows you to set your application as <strong>Home Screen</strong> application. Android looks for this particular intent filter and whenever you install your app with this intent-filter set then your application will appear in the list of installed launchers (a tap on the Home button will reveal the list).</p>
+
+<h2>Display installed applications in our custom homescreen</h2>
+
+<p>Now as we have finished with the manifest file, let&rsquo;s add some code to display the list of installed applications in our Home Screen, this way we can at least use the app after installing.</p>
+
+<h3>AsyncTaskLoader to asynchronously load applications</h3>
+
+<p>Here is the code to load the applications list asynchronously, we&rsquo;re using a custom AsyncTaskLoader class, later we&rsquo;ll hook it up in our fragment class using the Android Loaders.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppsLoader.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppsLoader</span> <span class="kd">extends</span> <span class="n">AsyncTaskLoader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">mInstalledApps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">final</span> <span class="n">PackageManager</span> <span class="n">mPm</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="nf">AppsLoader</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mPm</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getPackageManager</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loadInBackground</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// retrieve the list of installed applications</span>
+</span><span class='line'>    <span class="n">List</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ApplicationInfo</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span> <span class="o">=</span> <span class="n">mPm</span><span class="o">.</span><span class="na">getInstalledApplications</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">apps</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">apps</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ApplicationInfo</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">final</span> <span class="n">Context</span> <span class="n">context</span> <span class="o">=</span> <span class="n">getContext</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// create corresponding apps and load their labels</span>
+</span><span class='line'>    <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">items</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;(</span><span class="n">apps</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+</span><span class='line'>    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">apps</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">String</span> <span class="n">pkg</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">packageName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// only apps which are launchable</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getPackageManager</span><span class="o">().</span><span class="na">getLaunchIntentForPackage</span><span class="o">(</span><span class="n">pkg</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">AppModel</span> <span class="n">app</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AppModel</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">apps</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+</span><span class='line'>            <span class="n">app</span><span class="o">.</span><span class="na">loadLabel</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">items</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">app</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// sort the list</span>
+</span><span class='line'>    <span class="n">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">items</span><span class="o">,</span> <span class="n">ALPHA_COMPARATOR</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">items</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">deliverResult</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isReset</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// An async query came in while the loader is stopped.  We</span>
+</span><span class='line'>        <span class="c1">// don&#39;t need the result.</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">apps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">oldApps</span> <span class="o">=</span> <span class="n">apps</span><span class="o">;</span>
+</span><span class='line'>    <span class="n">mInstalledApps</span> <span class="o">=</span> <span class="n">apps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isStarted</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If the Loader is currently started, we can immediately</span>
+</span><span class='line'>        <span class="c1">// deliver its results.</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">deliverResult</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with</span>
+</span><span class='line'>    <span class="c1">// &#39;oldApps&#39; if needed; now that the new result is delivered we</span>
+</span><span class='line'>    <span class="c1">// know that it is no longer in use.</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">oldApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">oldApps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStartLoading</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mInstalledApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If we currently have a result available, deliver it</span>
+</span><span class='line'>        <span class="c1">// immediately.</span>
+</span><span class='line'>        <span class="n">deliverResult</span><span class="o">(</span><span class="n">mInstalledApps</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">takeContentChanged</span><span class="o">()</span> <span class="o">||</span> <span class="n">mInstalledApps</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// If the data has changed since the last time it was loaded</span>
+</span><span class='line'>        <span class="c1">// or is not currently available, start a load.</span>
+</span><span class='line'>        <span class="n">forceLoad</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onStopLoading</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Attempt to cancel the current load task if possible.</span>
+</span><span class='line'>    <span class="n">cancelLoad</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCanceled</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">onCanceled</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with &#39;apps&#39;</span>
+</span><span class='line'>    <span class="c1">// if needed.</span>
+</span><span class='line'>    <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onReset</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Ensure the loader is stopped</span>
+</span><span class='line'>    <span class="n">onStopLoading</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// At this point we can release the resources associated with &#39;apps&#39;</span>
+</span><span class='line'>    <span class="c1">// if needed.</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">mInstalledApps</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">onReleaseResources</span><span class="o">(</span><span class="n">mInstalledApps</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">mInstalledApps</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Helper method to do the cleanup work if needed, for example if we&#39;re</span>
+</span><span class='line'><span class="cm"> * using Cursor, then we should be closing it here</span>
+</span><span class='line'><span class="cm"> *</span>
+</span><span class='line'><span class="cm"> * @param apps</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onReleaseResources</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// do nothing</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Perform alphabetical comparison of application entry objects.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Comparator</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">ALPHA_COMPARATOR</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Comparator</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Collator</span> <span class="n">sCollator</span> <span class="o">=</span> <span class="n">Collator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">AppModel</span> <span class="n">object1</span><span class="o">,</span> <span class="n">AppModel</span> <span class="n">object2</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">sCollator</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">object1</span><span class="o">.</span><span class="na">getLabel</span><span class="o">(),</span> <span class="n">object2</span><span class="o">.</span><span class="na">getLabel</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">};</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The loader class above will only retrieve the applications for which a &ldquo;good&rdquo; launch intent is available, put simply we&rsquo;re only displaying those applications for which <code>getLaunchIntentForPackage</code> returns a valid launch intent.</p>
+
+<h3>GridView Adapter</h3>
+
+<p>A simple adapter used to populate the applications' icons and names in a <code>GridView</code>.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppListAdapter.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppListAdapter</span> <span class="kd">extends</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="kd">private</span> <span class="kd">final</span> <span class="n">LayoutInflater</span> <span class="n">mInflater</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="nf">AppListAdapter</span> <span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">simple_list_item_2</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mInflater</span> <span class="o">=</span> <span class="n">LayoutInflater</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">context</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setData</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">data</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">clear</span><span class="o">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">data</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">addAll</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="nd">@TargetApi</span><span class="o">(</span><span class="n">Build</span><span class="o">.</span><span class="na">VERSION_CODES</span><span class="o">.</span><span class="na">HONEYCOMB</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">addAll</span><span class="o">(</span><span class="n">Collection</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;?</span> <span class="kd">extends</span> <span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">items</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">//If the platform supports it, use addAll, otherwise add in loop</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">Build</span><span class="o">.</span><span class="na">VERSION</span><span class="o">.</span><span class="na">SDK_INT</span> <span class="o">&amp;</span><span class="n">gt</span><span class="o">;=</span> <span class="n">Build</span><span class="o">.</span><span class="na">VERSION_CODES</span><span class="o">.</span><span class="na">HONEYCOMB</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">items</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span><span class="k">else</span><span class="o">{</span>
+</span><span class='line'>        <span class="k">for</span><span class="o">(</span><span class="n">AppModel</span> <span class="nl">item:</span> <span class="n">items</span><span class="o">){</span>
+</span><span class='line'>            <span class="kd">super</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Populate new items in the list.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="nd">@Override</span> <span class="kd">public</span> <span class="n">View</span> <span class="n">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">View</span> <span class="n">view</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">convertView</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">view</span> <span class="o">=</span> <span class="n">mInflater</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">layout</span><span class="o">.</span><span class="na">list_item_icon_text</span><span class="o">,</span> <span class="n">parent</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">view</span> <span class="o">=</span> <span class="n">convertView</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">AppModel</span> <span class="n">item</span> <span class="o">=</span> <span class="n">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">((</span><span class="n">ImageView</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">icon</span><span class="o">)).</span><span class="na">setImageDrawable</span><span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getIcon</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">((</span><span class="n">TextView</span><span class="o">)</span><span class="n">view</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">text</span><span class="o">)).</span><span class="na">setText</span><span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getLabel</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="n">view</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h3>Grid Fragment</h3>
+
+<p>Grid view container fragment class, uses Android Loaders to load the list of applications and displays them in the Grid view.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>AppsGridFragment.java </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AppsGridFragment</span> <span class="kd">extends</span> <span class="n">GridFragment</span> <span class="kd">implements</span> <span class="n">LoaderManager</span><span class="o">.</span><span class="na">LoaderCallbacks</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">AppModel</span><span class="o">&gt;&gt;</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">AppListAdapter</span> <span class="n">mAdapter</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityCreated</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">.</span><span class="na">onActivityCreated</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">setEmptyText</span><span class="o">(</span><span class="s">&quot;No Applications&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mAdapter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AppListAdapter</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'>    <span class="n">setGridAdapter</span><span class="o">(</span><span class="n">mAdapter</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// till the data is loaded display a spinner</span>
+</span><span class='line'>    <span class="n">setGridShown</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// create the loader to load the apps list in background</span>
+</span><span class='line'>    <span class="n">getLoaderManager</span><span class="o">().</span><span class="na">initLoader</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="k">this</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">onCreateLoader</span><span class="o">(</span><span class="kt">int</span> <span class="n">id</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="nf">AppsLoader</span><span class="o">(</span><span class="n">getActivity</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLoadFinished</span><span class="o">(</span><span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loader</span><span class="o">,</span> <span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">apps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mAdapter</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">apps</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isResumed</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">setGridShown</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">setGridShownNoAnimation</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onLoaderReset</span><span class="o">(</span><span class="n">Loader</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ArrayList</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">AppModel</span><span class="o">&amp;</span><span class="n">gt</span><span class="o">;&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">loader</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mAdapter</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">onGridItemClick</span><span class="o">(</span><span class="n">GridView</span> <span class="n">g</span><span class="o">,</span> <span class="n">View</span> <span class="n">v</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">AppModel</span> <span class="n">app</span> <span class="o">=</span> <span class="o">(</span><span class="n">AppModel</span><span class="o">)</span> <span class="n">getGridAdapter</span><span class="o">().</span><span class="na">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">app</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getActivity</span><span class="o">().</span><span class="na">getPackageManager</span><span class="o">().</span><span class="na">getLaunchIntentForPackage</span><span class="o">(</span><span class="n">app</span><span class="o">.</span><span class="na">getApplicationPackageName</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">intent</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h3>Layout file</h3>
+
+<p>A simple layout file to embed the grid fragment.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>homescreen.xml </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="ni">&amp;lt;</span>RelativeLayout xmlns:android=<span class="ni">&amp;ldquo;</span><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>http://schemas.android.com/apk/res/android<span class="nt">&lt;/a&gt;</span><span class="ni">&amp;rdquo;</span><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;pre&gt;&lt;code&gt;</span>xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+</span><span class='line'>android:layout_width=&quot;match_parent&quot;
+</span><span class='line'>android:layout_height=&quot;match_parent&quot;
+</span><span class='line'>android:paddingLeft=&quot;@dimen/activity_horizontal_margin&quot;
+</span><span class='line'>android:paddingRight=&quot;@dimen/activity_horizontal_margin&quot;
+</span><span class='line'>android:paddingTop=&quot;@dimen/activity_vertical_margin&quot;
+</span><span class='line'>android:paddingBottom=&quot;@dimen/activity_vertical_margin&quot;
+</span><span class='line'>tools:context=&quot;.HomeScreen&quot;<span class="ni">&amp;gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="ni">&amp;lt;</span>fragment
+</span><span class='line'>        android:layout_width=&quot;match_parent&quot;
+</span><span class='line'>        android:layout_height=&quot;match_parent&quot;
+</span><span class='line'>        android:name=&quot;ch.arnab.simplelauncher.AppsGridFragment&quot;
+</span><span class='line'>        android:id=&quot;@+id/apps_grid&quot; /<span class="ni">&amp;gt;</span>
+</span><span class='line'><span class="nt">&lt;/code&gt;&lt;/pre&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;&lt;/RelativeLayout&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>&nbsp;</p>
+
+<h2>Running the homescreen application</h2>
+
+<p>As it&rsquo;s a Launcher app, so when you install it you don&rsquo;t get to see anything unless you tap on the home button. The tap on the Home button  shows you a chooser dialog from which you can select the appropriate Launcher app.</p>
+
+<p>That&rsquo;s it, you now have your own custom launcher application. Although a full-fledged launcher app like the ones that come with Android phones has many features built into them, but you can use this as a basic building block and start writing a more advanced and complex launcher as you learn.</p>
+
+<p>For those who wants to investigate further, do take a look at the default launcher application code here: <a href="https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/">Android Stock Launcher App</a></p>
+
+<p><strong>Update</strong>: I wrote another post which provides a high-level overview of what all things are required to develop a &ldquo;<strong>kiosk-mode</strong>&rdquo; Android application. You can check it out here &ndash; <a href="/blog/2013/11/developing-kiosk-mode-applications-in-android/">Developing kiosk-mode applications in Android</a></p>
+
+<p>You can download the full source code used in this article from this Github <a href="https://github.com/arnabc/simplelauncher/zipball/master">repository</a>.</p>
+
+<div class="github-widget" data-repo="arnabc/simplelauncher"></div>
+
+
+<hr />
+
+<h2>Note: I have developed a generic Kiosk Management Solution called <a href="https://mobilock.in">MobiLock Pro</a> which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out <strong>MobiLock Pro</strong>.</h2>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Android - How to send gzipped JSON in HTTP request]]></title>
+    <link href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
+    <updated>2012-09-30T18:41:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
+    <content type="html"><![CDATA[<p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
+
+<!-- more -->
+
+
+<p>The <a href="http://developer.android.com/reference/android/net/http/AndroidHttpClient.html"><code>AndroidHttpClient</code></a> module offers a way to achieve this, when you&rsquo;re sending JSON requests you can gzip the content of the request params and add some necessary HTTP headers, which will provide a hint to your server that it has to decode the content before it is usable. Needless to say that this technique is not just limited to sending JSON, you can of course use it if you&rsquo;re sending CSV or text file over the network to server.</p>
+
+<p>I&rsquo;ll show a way how this can be done using a Rails backend (that&rsquo;s what I use), but I presume this should not be too difficult to implement in case you&rsquo;re not using Rails. I&rsquo;ll be using JSON as an example here:</p>
+
+<p>To encode or decode the JSON content you can use the following utility module in Android:</p>
+
+<p>``` java util.java
+public class Util {</p>
+
+<pre><code>/**
+ * Converts an InputStream to String
+ * 
+ * @param is
+ * @return
+ * @throws IOException
+ */
+public static String streamToString(InputStream content) throws IOException {
+    byte[] buffer = new byte[1024];
+    int numRead = 0;
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    while ((numRead = content.read(buffer)) != -1) {
+        baos.write(buffer, 0, numRead);
+    }
+
+    content.close();
+
+    return new String(baos.toByteArray());
+}
+
+/**
+ * Compresses the content of the request parameters (as a string). Sets
+ * appropriate HTTP headers also so that the server can decode it properly.
+ * 
+ * @param context Context
+ * @param content The string request params, ideally JSON string
+ * @param postReq The HttpPost request object
+ * 
+ */
+public static void setCompressedEntity(Context context, String content, HttpPost postReq) {
+    try {
+        byte[] data = content.getBytes("UTF-8");
+
+        // if the length of the data exceeds the minimum gzip size then only
+        // gzip it else it's not required at all
+        if (content.length() &gt; AndroidHttpClient
+                .getMinGzipSize(context.getContentResolver())) {
+            // set necessary headers
+            postReq.setHeader("Content-Encoding", "gzip");
+        }
+
+        // Compressed entity itself checks for minimum gzip size
+        // and if the content is shorter than that size then it
+        // just returns a ByteArrayEntity
+        postReq.setEntity(AndroidHttpClient.getCompressedEntity(data, context.getContentResolver()));
+
+    } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+/**
+ * Extracts the response content. If the server response is compressed, then
+ * it transparently decompresses the content. In order to indicate to server
+ * that you can consume JSON response, use the following code to add the "Accept"
+ * header:
+ *
+ * AndroidHttpClient.modifyRequestToAcceptGzipResponse(HttpRequest request)
+ * 
+ * @param response
+ *                  HttpResponse Object
+ * @return String content of the HttpResponse
+ */
+public static String getIfCompressed(HttpResponse response) {
+    if (response == null)
+        return null;
+
+    try {
+        InputStream is = AndroidHttpClient.getUngzippedContent(response.getEntity());
+        return streamToString(is);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<p>The HTTP header, which indicates to server that the request content is gzipped, is <code>Content-Encoding: gzip</code>. On the Rails side you can use the following <strong>Rack</strong> middleware to decode JSON requests (you can set your webserver for example nginx to do the encoding on JSON responses):</p>
+
+<p>A Rack middleware to decode the gzipped JSON, thanks to this <a href="https://gist.github.com/2109707">gist</a> by <a href="https://gist.github.com/relistan">relistan</a>:</p>
+
+<p>``` ruby compressed_requests.rb
+class CompressedRequests
+  def initialize(app)</p>
+
+<pre><code>@app = app
+</code></pre>
+
+<p>  end</p>
+
+<p>  def method_handled?(env)</p>
+
+<pre><code>!!(env['REQUEST_METHOD'] =~ /(POST|PUT)/)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def encoding_handled?(env)</p>
+
+<pre><code>['gzip', 'deflate'].include? env['HTTP_CONTENT_ENCODING']
+</code></pre>
+
+<p>  end</p>
+
+<p>  def call(env)</p>
+
+<pre><code>if method_handled?(env) &amp;&amp; encoding_handled?(env)
+  extracted = decode(env['rack.input'], env['HTTP_CONTENT_ENCODING'])
+
+  env.delete('HTTP_CONTENT_ENCODING')
+  env['CONTENT_LENGTH'] = extracted.length
+  env['rack.input'] = StringIO.new(extracted)
+end
+
+status, headers, response = @app.call(env)
+return [status, headers, response]
+</code></pre>
+
+<p>  end</p>
+
+<p>  def decode(input, content_encoding)</p>
+
+<pre><code>case content_encoding
+  when 'gzip' then Zlib::GzipReader.new(input).read
+  when 'deflate' then Zlib::Inflate.inflate(input.read)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now put this in somewhere in your Rails web application directory for example <code>lib/middleware</code>, just make sure that the file is loaded when Rails boots. To include the file in Rails' <strong>autoload</strong> path, add it like this:</p>
+
+<p><code>ruby application.rb
+config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
+</code></p>
+
+<p>Once that is done, then you need to add this tiny little Rack app as a middleware, and the important trick is to add it before the <code>ActionDispatch::ParamsParser</code> middleware in Rails 3:</p>
+
+<p>``` ruby application.rb</p>
+
+<h1>Handle Compressed Requests, this middleware makes gzip content</h1>
+
+<h1>handling transparent to the Rails stack</h1>
+
+<p>config.middleware.insert_before ActionDispatch::ParamsParser, &ldquo;CompressedRequests&rdquo;
+```</p>
+
+<p>That&rsquo;s all you need both on client and server to send and receive Gzipped content. If you&rsquo;re sending JSON from client and you wan&rsquo;t rails to interpret it as JSON, then don&rsquo;t forget to add <code>Content-Type: application/json</code> on your HTTP Request header.</p>
+
+<p>Happy coding! If you have anything to say feel free to contact me on Twitter <a href="http://twitter.com/arnabc">@arnabc</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
+    <link href="http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application/"/>
+    <updated>2012-01-21T00:26:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application</id>
+    <content type="html"><![CDATA[<p>Well, the title of the post may not be descriptive enough of the complexity that we dealt with in one of our recent projects. Before I delve deeper into the actual problem, let me give you some background of what we&rsquo;re trying to achieve. We&rsquo;ve been working on an Android application for some time which is going to be installed in kiosks or in cabs mainly on Android tablets (currently Android 2.2 devices), basically this is a sort of in-cab entertainment system where you can listen to music, watch videos, latest movie trailers and promos, read latest news, search places and find them in maps. You may think what&rsquo;s so complicated about it? Well this app is an Android Homescreen application and this is going to be the only application that users can access from the tablets and above all it&rsquo;ll be <strong>remotely managed</strong>.</p>
+
+<p>The term <strong>remotely managed</strong> means that the app will be automatically updated over the air, there will be a provisioning server where the admins can publish/upload a new build, and that build will automatically be installed in the devices. Other than that the device can also be remotely restarted or shut down. The content that users can access or play using the app is stored in the device for faster access, and that content is synced (i.e. updated) periodically from a remote content syncing server. All of these are happening over the internet and the devices are equipped with a 3G chip, which makes it easier to download large amount of data with a decent network speed, else the content syncing would be a real pain. Below is the list of rough requirements that we had:</p>
+
+<ul>
+<li>The main app will be the only app which users can access.</li>
+<li>Automatic update over the air using a provisioning server.</li>
+<li>Sync content from a remote content syncing server.</li>
+<li>Report Crashes and device health statuses to the server.</li>
+</ul>
+
+
+<!--more-->
+
+
+<p>If you look at the requirements above, this ain&rsquo;t an easy task and sure it&rsquo;s not, we&rsquo;re developing the app since last few months and are close to completion, the app is currently being field tested and hopefully it&rsquo;ll soon be live out there in the wild.</p>
+
+<p>So the big question is what are the challenges that we faced while we pulled off this effort, the purpose of this blog post is to share some of the findings/knowledge that we&rsquo;ve gained over the period of time while developing the app. The ways that we&rsquo;ve adopted are not the ones which can be adopted if you&rsquo;re going to have your app be distributed through the Android market, our app isn&rsquo;t or will not be distributed from the Android market, this is a custom application developed for a very specific/limited set of devices in mind. I&rsquo;ll cover each of the requirements mentioned above and will share some of the rough design choices that we made in order to meet the requirements.</p>
+
+<h2>The main app will be the only app which users can access</h2>
+
+<p>There&rsquo;s only one way that you can have this kind of application in Android, make your app a homescreen app, so that whenever users press home/back button they&rsquo;ll land up right there in your app, and they can&rsquo;t get out of it (provided your app is the default one). In order to prevent users from exiting your app, you may need to handle some other stuff like options menu, disable recent items, and may be some extra buttons (some Chinese devices come with extra buttons on 7&Prime; Android tablets) etc. These extra keys can be handled/prevented using Android key handling code.</p>
+
+<h2>Automatic update over the air using a provisioning server</h2>
+
+<p>This is an interesting part, you may be aware of that in Android the automatic update of an app can only happen through Marketplace, there&rsquo;s no other way to update an app. But our app is not going to be distributed through Marketplace, so how do we update then? Well there&rsquo;s no easy way to do it, and the process is complicated.</p>
+
+<p>First of all, in Android in order to <em>silently install</em> an app, you need special permission called INSTALL_PACKAGES which is a <em>system permission</em> and IS NOT available to apps <em>not signed</em> with system/firmware certificate. This is an issue that we need to get past in order to make it happen, after few days of searching and testing several options, I narrowed it down to the following options:</p>
+
+<ol>
+<li><strong>Sign the app with the system certificate</strong> &ndash; This was not possible because we couldn&rsquo;t procure the certificate from the hardware vendor of our choice.</li>
+<li><strong>Install our own Android custom ROM with the app bundled</strong> &ndash; This was possible, but it requires more engineering effort as well as taking care of device drivers that manufacturers ship with the device. Other than that there&rsquo;s a maintenance effort involved in future where we have to ensure that our custom Android ROM works with at least two to three different devices. So, this too was not a viable solution for us.</li>
+<li><strong>Root the device and install the package through code</strong> &ndash; This was the last option that I tried and IT WORKED!, after couple of iterations on rooting procedure, I managed to root the device properly.</li>
+</ol>
+
+
+<p>At first I tried the <strong>rageagainstthecage</strong> exploit to root, but it were only able to temporarily root the device and it wouldn&rsquo;t survive a reboot. Then I used <strong>psneuter</strong> to root the device and installed <strong>busybox</strong> and the modified <strong>su</strong> binary provided by the excellent guys from <a href="http://shortfuse.org/"><strong>SuperOneClick</strong></a> installer. Along with that I also installed the <a href="https://market.android.com/details?id=com.noshufou.android.su&amp;hl=en">Superuser</a> app to manage the <em>su</em> permissions. Once the rooting procedure is in place it&rsquo;s time to move on to code and write an Android service which can automatically install our application.</p>
+
+<h3>Updater Service</h3>
+
+<p>This service is the crux of this application, it acts as a &ldquo;remote control&rdquo; to manage the device as well as our homescreen application. We decided to build it as a separate app not part of the homescreen application, because this app is not going to have any GUI. So how does this work? Below is the rough diagram of it&rsquo;s architecture:</p>
+
+<p><img src="/images/updater-service-sequence-diagram.png" alt="Updater Service Sequence Diagram" /></p>
+
+<p>In the above diagram, our Updater app is started whenever the device is rebooted (as per our installation process, we reboot the device after installing the update service app), it sets up a repeating alarm using a <em>PendingIntent</em>, which is invoked after a certain period of time, in the mean time it also makes a quick request to the provisioning server for any available update. If there&rsquo;s an update then the UpdateService downloads the APK (link provided in the update check response) and once it&rsquo;s downloaded (stored in the SDcard) it then fires up an intent to start the PackageInstaller and gives the APK file path as part of the intent payload. The PackageInstaller then runs the <code>pm install -r &lt;apkPath&gt;</code> command with <code>su</code> privilege. In order to execute the commands as <em>root</em> I used a modified version of the <a href="http://muzikant-android.blogspot.com/2011/02/how-to-get-root-access-and-execute.html">excellent piece of code available from here</a>. Once the installation process is complete we notify the backend server that the device has been updated with the latest app (by the way it may already be clear to you that the provisioning server has the list of devices running in the wild and knows which device is running what version of the app). Anyway, this cycle of checking for updates continues as every time the alarm fires or the device is rebooted.</p>
+
+<p>Although the entire procedure went smoothly, it wasn&rsquo;t without a hitch, as I mentioned that our app is a homescreen application and in Android when you have multiple homescreen apps, every time you click on the home button you&rsquo;re presented with a list of homescreen apps to choose from. So in our case we have two homescreen apps one is the default Android <strong>Launcher</strong> and the other is our homescreen app, as part of the installation procedure we set that app up to be the default one. But after update that settings was getting reset and pressing on the home button again was displaying that list of homescreen apps to choose from. We tried to solve this through code by setting our own <code>Activity</code> as the default homescreen app using the Android API <code>addPreferredActivty()</code> but that didn&rsquo;t work because it has been removed/disabled by Google from Android 2.2 Froyo onwards (it was available till 2.1), the device that we&rsquo;re using has the Android version 2.2.2. This was almost a dead end and that time we came up with a <strong>very interesting</strong> hack, and the trick is very simple <strong>just rename the launcher APK</strong>, ya that&rsquo;s it just rename it and it&rsquo;s gone :&ndash;). So here&rsquo;s the steps that we have:</p>
+
+<h4>Before Install Steps</h4>
+
+<ol>
+<li>Mount the <code>/system</code> folder as RW volume using <code>busybox</code>, by default it&rsquo;s readonly.</li>
+<li>Restore(rename) the original lancher apk back to &ldquo;Launcher.apk&rdquo;</li>
+<li>Unmount the <code>/system</code> back to it&rsquo;s original ReadOnly mode.</li>
+</ol>
+
+
+<p>Example commands:
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example commands </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>busybox mount -o rw,remount /system
+</span><span class='line'><span class="nv">$ </span>mv /system/app/Launcher.tmp.apk /system/app/Launcher.apk
+</span><span class='line'><span class="nv">$ </span>busybox mount -o ro,remount /system
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<h4>After Install Steps</h4>
+
+<ol>
+<li>Mount the <code>/system</code> folder as RW volume using <code>busybox</code>, by default it&rsquo;s readonly.</li>
+<li>Rename the original &ldquo;Launcher.apk&rdquo; to &ldquo;Launcher.tmp.apk&rdquo;</li>
+<li>Unmount the <code>/system</code> back to it&rsquo;s original ReadOnly mode.</li>
+</ol>
+
+
+<p>Example commands:
+<div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>Example commands </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>busybox mount -o rw,remount /system
+</span><span class='line'><span class="nv">$ </span>mv /system/app/Launcher.apk /system/app/Launcher.tmp.apk
+</span><span class='line'><span class="nv">$ </span>busybox mount -o ro,remount /system
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Note: In some devices the Launcher apk may be named as Launcher2.apk.</p>
+
+<h2>Sync content from a remote content syncing server</h2>
+
+<p>Similarly to the update service above, the Content Syncing part is also a separate app without a GUI, it gets started on RECEIVE_BOOT_COMPLETED intent and checks for updated content once a day. We download a pretty large amount of data which can range anywhere from 100MB-1GB. Below is the sequence diagram of the rough architecture that we have:</p>
+
+<p><img src="/images/content-sync-sequence-diagram.png" alt="Content Sync Sequence Diagram" /></p>
+
+<p>Once the download sync is complete, the app sends an Intent notifying the Main homescreen application about the content update so that it can display a friendly message to the user in case the device content is being used/played at that time. The main app stores some of the data in memory or in a SQLite database when it starts, so in order to cleanly rebuild that entire data structure we&rsquo;re currently rebooting the device. But in future <em>we&rsquo;re planning to avoid it, so that the content update does not need a reboot</em>.</p>
+
+<h2>Conclusion</h2>
+
+<p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
+
+<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#97;&#x72;&#x6e;&#97;&#x62;&#99;&#x40;&#119;&#101;&#x62;&#x67;&#x79;&#x61;&#110;&#105;&#46;&#99;&#111;&#109;">&#97;&#114;&#110;&#x61;&#x62;&#x63;&#64;&#119;&#101;&#98;&#x67;&#121;&#97;&#x6e;&#x69;&#x2e;&#99;&#x6f;&#109;</a>, I&rsquo;d be happy to help you.</p>
+
+<p>Thanks for reading!</p>
+
+<hr />
+
+<h2>Note: I have developed a generic Kiosk Management Solution called <a href="https://mobilock.in">MobiLock Pro</a> which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out <strong>MobiLock Pro</strong>.</h2>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,179 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>"new" Operator in JavaScript - Arnab Chakraborty</title>
+	<meta name="author" content="Arnab Chakraborty">
+
+	
+	<meta name="description" content="new operator in JavaScript is used to create an instance of an object">
+	<meta name="keywords" content="JavaScript, new-operator">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Arnab Chakraborty" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://arnabc.github.io/blog/2010/04/new-operator-in-javascript/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			  <header id="header" role="banner" class="inner"><div class="profilepic">	
+  <img src="http://www.gravatar.com/avatar/0eeaf53af64209dc60b475c49ed5a853?s=160" alt="Arnab Chakraborty" style="width: 160px; min-height: 160px" />
+</div>
+<hgroup>
+  <h1><a href="/">Arnab Chakraborty</a></h1>
+</hgroup>
+
+<p class="subtitle">A cognitive perspective on web.</p>
+<nav id="main-nav"><ul class="main-navigation clearfix">
+  <li>
+    <a href="/">Home</a></li>
+  <li>
+    <a href="/blog/archives">Archives</a></li>
+  <li>
+    <a href="/about">About</a>
+  </li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+    
+		
+    
+		
+		<a class="twitter" href="http://twitter.com/arnabc" title="Twitter">
+		  <i class="icon-twitter"></i>
+		</a>
+		
+    
+		
+		<a class="github" href="https://github.com/arnabc" title="GitHub">
+      <i class="icon-github"></i>
+    </a>
+		
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/arnabchakraborty1">
+		  <i class="icon-linkedin"></i>
+		</a>
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS"><i class="icon-rss"></i></a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+  	<h1 class="title" itemprop="name">"New" Operator in JavaScript</h1>
+  </header>
+	<div class="entry-content" itemprop="articleBody"><p>In JavaScript, there’s an operator called <code>new</code> which we use to create an instance of an object (i.e Constructor function). So, what does <strong>new</strong> do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the <strong>new</strong> operator.</p>
+
+<!--more-->
+
+
+<p>Consider the following example:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above code pretty much says that you first create an instance of the constructor function (note the upper case first letter, it is a convention not a rule ) using <code>new</code> operator, once that statement executes you now have an object as the value of <code>foo</code> and in the next line it simply prints the “<em>name”</em> property of that object, which in this case is an instance variable of the constructor function &ldquo;Foo&rdquo;.</p>
+
+<p>Take a look at the example below and guess what would be the value of <code>foo</code>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Foo</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>     <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'>     <span class="k">return</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+</span><span class='line'><span class="nx">foo</span><span class="p">.</span><span class="nx">name</span> <span class="c1">// =&gt; Foo</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Interesting thing is that in this case the value of <code>foo</code> is still an object, but we did return a String, so why the hell <code>foo</code> contains an object? Well, the purpose of the <strong>new</strong> keyword is to ensure that you always get an object, so anything other than object is discarded, if you return an object then that will be used else a new object is created and returned. Now if we replace our return statement using this code <code>return { prop: 'Foo' };</code> then the value of <code>foo</code> will have a different value altogether and accessing <code>foo.name</code> will result in <code>undefined</code>.</p>
+
+<p>Interestingly, if you return <code>null</code> then that will be NOT be used, even though you might think that <em>null</em> is an object and <code>typeof(null) === 'object'</code>, so it should use that. In fact, it does not, it appears that <strong>new</strong> returns only objects which can evaluate to truthy value.</p>
+
+<p>The last but not the least, if you return a <strong>function</strong> other than object then the function will be used. Why? Because functions are objects too, only difference is that they are special objects, that’s why there’s a separation between objects and functions, the <code>typeof</code> operator handles that properly, but in this case it appears that the <strong>new</strong> doesn&rsquo;t really care about that.</p>
+</div>
+
+</article>
+
+	
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Arnab Chakraborty -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="/javascripts/slash.js"></script>
+
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-28528371-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+<!-- Include github widget to display pro repo info -->
+
+<script src="/javascripts/jquery.githubRepoWidget.min.js"></script>
+
+
+		</div>
+	</div>
+</body>
+</html>

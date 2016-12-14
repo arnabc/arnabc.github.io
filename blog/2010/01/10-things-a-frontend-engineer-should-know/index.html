@@ -1,0 +1,156 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>10 things a FrontEnd Engineer should know - Arnab Chakraborty</title>
+	<meta name="author" content="Arnab Chakraborty">
+
+	
+	<meta name="description" content="10 important things a FrontEnd Engineer should know as part of their work.">
+	<meta name="keywords" content="JavaScript, FrontEnd Engineering">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Arnab Chakraborty" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://arnabc.github.io/blog/2010/01/10-things-a-frontend-engineer-should-know/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			  <header id="header" role="banner" class="inner"><div class="profilepic">	
+  <img src="http://www.gravatar.com/avatar/0eeaf53af64209dc60b475c49ed5a853?s=160" alt="Arnab Chakraborty" style="width: 160px; min-height: 160px" />
+</div>
+<hgroup>
+  <h1><a href="/">Arnab Chakraborty</a></h1>
+</hgroup>
+
+<p class="subtitle">A cognitive perspective on web.</p>
+<nav id="main-nav"><ul class="main-navigation clearfix">
+  <li>
+    <a href="/">Home</a></li>
+  <li>
+    <a href="/blog/archives">Archives</a></li>
+  <li>
+    <a href="/about">About</a>
+  </li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+    
+		
+    
+		
+		<a class="twitter" href="http://twitter.com/arnabc" title="Twitter">
+		  <i class="icon-twitter"></i>
+		</a>
+		
+    
+		
+		<a class="github" href="https://github.com/arnabc" title="GitHub">
+      <i class="icon-github"></i>
+    </a>
+		
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/arnabchakraborty1">
+		  <i class="icon-linkedin"></i>
+		</a>
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS"><i class="icon-rss"></i></a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+  	<h1 class="title" itemprop="name">10 Things a FrontEnd Engineer Should Know</h1>
+  </header>
+	<div class="entry-content" itemprop="articleBody"><p>Frontend engineering as it stands today is a bit of vague and unspecified territory, it’s still not clearly understood may be because of the lack of clarity around stuffs a frontend engineer does. To simply put, frontend engineering means understanding the browsers best, the work of a frontend engineer is what you see when you do “view source”. So, how can you become a frontend engineer? In this post I’ll list down some of the things that a would be frontend engineer should know about. Frontend engineers write software using HTML, CSS and JavaScript, and yes I meant ‘writing software’, because if you look at modern day web applications like Gmail, Yahoo! Mail, Google Wave all are complex applications which involves significant amount of JavaScript, CSS, HTML and other technologies. So basically it means a frontend engineer should be specialized in HTML, CSS and JavaScript. </p> <!--more--></p>
+
+<p>Below are the list of things that I would expect to see in a would be frontend engineer:</p>
+
+<ul>
+<li><strong>Semantic and non-semantic markup</strong> &ndash; Understanding the differences between semantic and non-semantic HTML is a key area in web development, in HTML we have different tags with different semantic meaning, a frontend engineer should know which tag to use when, it’s not a good practice to use &lt;DIV&gt; tag to display paragraphs even if both &lt;P&gt; and &lt;DIV&gt; visually look similar.</li>
+<li><strong>Rendering modes</strong> – Every browser for the sake of backward compatibility has implemented two types of rendering modes, and browser’s use DOCTYPE tag as the rendering mode switcher. It’s important to know about rendering modes because they drastically affect the way browsers render a webpage. Primarily, there are two rendering modes “Standards mode” and “Quirks mode”, some browsers even have “almost standards mode”. In “standards mode” browser will try to display a webpage in the most efficient way possible, where as in “quirks mode” browser will display the page in a backward compatible way.</li>
+<li><strong>Structure, presentation and behavior</strong> – These are the key design elements in building websites. The structure (HTML), presentation/styling (CSS) and behavior (JavaScript) should be separated out, which helps make you page modular and maintainable. Remember it also speeds up your site, because the presentation and behavior layer will likely be cached by the browser, which results in faster downloads. Use meaningful markup with Class and Ids as the possible hook for adding styling and behavior. Never use inline event handlers in your HTML, instead use Unobtrusive JavaScript to attach event handlers, which helps keep the markup clean.</li>
+<li><strong>Ability to hand code your HTML</strong> – There are some WYSIWYG editors out there in the market, but I would recommend not to use any one of them, instead learn to write HTML by hand coding, because this will give you the ability to create a visual picture of your page layout in your mind, if you continue this practice after some time you will notice that you can almost tell how many DIVs you need to create a particular layout just seeing that design. Remember that all those big web applications out there were created by hand coding HTML and CSS, once you are proficient writing HTML then you can use some code auto-completion utilities to speed things up a little bit.</li>
+<li><strong>CSS and browser quirks</strong> – The CSS stands for ‘Cascading Style Sheets’, here ‘Cascading’ means a way to determine which CSS rules are going to apply on a particular element. So it’s important to know how <em>Specificity</em>, <em>Order</em>, <em>Inheritance</em> and above all the <em>Box Model</em> are being calculated. Some browsers have terribly wrong implementation of some CSS standards so it is important to have the knowledge regarding browser workarounds, there are CSS hacks and fixes available for some browsers most notably Internet Explorer, which you can use or you might consider using _conditional-comments a_s a way to include special style sheet for that depending on your needs. Another thing in this context is the knowledge regarding ‘<a href="http://www.google.co.in/search?q=hasLayout">hasLayout</a>’ concept in IE6/7, this concept is one of the main reasons behind CSS bugs in above mentioned browsers.</li>
+<li><strong>JavaScript Language</strong> – Learn this language, it’s no toy language anymore and it’s not even distantly related with Java excluding the naming similarity. It is an Object-oriented language with <em>prototypal inheritance</em> pattern. This is the language which drives modern day web applications, since the advent of Ajax this period has seen a tremendous growth of JavaScript. I believe that the way <strong>HTML5</strong> is heading this language is going to be one of the most important programming languages in the next decade. JavaScript was designed in a hurry, so there are some rough edges and some incorrect implementation, hence it’s important to know the good and bad parts of the language. In modern web applications JavaScript interacts heavily with DOM(Document Object Model), so having a good understanding of DOM methods, traversal techniques, DOM manipulation are necessary. I recommend picking up <a href="http://www.amazon.com/Professional-JavaScript-Developers-Wrox-Programmer/dp/047022780X">Professional JavaScript for Web Developers</a>.</li>
+<li><strong>JavaScript and CSS Frameworks</strong> – Once you are well familiar with all the above concepts, it’s time to pick up few JavaScript and CSS frameworks. Nevertheless, the JavaScript Frameworks that you should check out are <a href="http://jquery.com/">jQuery</a>, <a href="http://developer.yahoo.com/yui/">YUI</a> and <a href="http://www.dojotoolkit.org/">Dojo</a> etc. and for CSS Frameworks there are <a href="http://wiki.github.com/stubbornella/oocss">OOCSS</a>, <a href="http://960.gs/">960.gs</a> and <a href="http://www.blueprintcss.org/">Blueprint</a> etc.. Even though you can go through with those libraries, I would recommend you should go through their source code whenever possible, this will give you a lot of insight into what’s happening and how those libraries have organized their code, you’ll learn a lot, I guarantee.</li>
+<li><strong>Website Optimization</strong> – This is a very important point, and you just cannot ignore it&#160; anymore. Latency is one of the main reason behind slow websites, but you can do very little about it, so focus on areas where optimization can give you significant result. Learn how to cache your assets using proper HTTP headers, serve your assets using Gzip, optimize images (there are some good tools around one example is <a href="http://github.com/kristoferbaxter/SmallerMaker">SmallerMaker</a> ), know how browsers do parallel downloading, consider using ‘Lazy Loading’ techniques, load scripts on-demand/on the fly when required and use CSS sprites where suitable(although you can take a peek at <em><a href="http://www.stevesouders.com/blog/2009/11/16/cssembed-automatically-data-uri-ize/">Data URIs</a></em>). For more info check out <a href="http://www.stevesouders.com/">stevesouders.com</a>.</li>
+<li><strong>Staying up-to-date</strong> – The frontend technologies are changing almost everyday, so it’s very necessary to stay up-to-date, you got to keep an eye on the stuffs happening around JavaScript, HTML 5, CSS3 and other best practices, which will help you gather information and knowledge upfront, which you can later use in your work.</li>
+<li><strong>Communication and co-ordination</strong> – Last but not the least, this is a very important job that a frontend engineer has to do everyday with his peers, managers and creative designers. He/she has to communicate well in terms of what can be possible in the browser, how changing something can improve or degrade accessibility or performance. I have seen designers often like to design interfaces by pouring every bit of their creativity and aesthetic sense, which is a good thing definitely, but in a real world implementing those interfaces using HTML/CSS is sometimes impossible, hence it is the frontend engineer who should actually communicate with the designers about what can be done and what can not. In some cases he/she often has to push back some features which might introduce too much complexity or impact the performance of the application as a whole, and while doing so I would expect that a good frontend engineer to come out with alternate solutions in a constructive way. As frontend engineers sit somewhere between middle-tier, creative and product management, so their efforts are directly related with these people, communicating and coordinating properly will definitely serve well.</li>
+</ul>
+
+
+<p>Well if you want to be a frontend engineer make sure that you know stuff I mentioned above, these are just the beginning by the way, there are a lot of things that you will learn eventually, but don’t forget to make sure that your base is strong, do a lot of practice, ask questions, read articles and blogs and finally think like a frontend engineer. All the best.</p>
+
+<p><em>Disclaimer: The use of the word ‘engineer’ is not meant to do anything with ‘Engineering discipline’ at all, I know traditional engineers do a lot of hard work to achieve that academic qualification, as working in Frontend also involves similar amount of hard work that’s why the term has been used here to refer the collective effort of these hard-working people.</em></p>
+</div>
+
+</article>
+
+	
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Arnab Chakraborty -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="/javascripts/slash.js"></script>
+
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-28528371-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+<!-- Include github widget to display pro repo info -->
+
+<script src="/javascripts/jquery.githubRepoWidget.min.js"></script>
+
+
+		</div>
+	</div>
+</body>
+</html>

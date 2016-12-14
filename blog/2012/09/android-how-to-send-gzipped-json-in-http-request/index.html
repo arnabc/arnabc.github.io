@@ -1,0 +1,407 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Android - How to send gzipped JSON in HTTP request - Arnab Chakraborty</title>
+	<meta name="author" content="Arnab Chakraborty">
+
+	
+	<meta name="description" content="Android - How to Send Gzipped JSON in HTTP Request If you have ever developed an Android application which sends and consumes large amount of JSON &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Arnab Chakraborty" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+	
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			  <header id="header" role="banner" class="inner"><div class="profilepic">	
+  <img src="http://www.gravatar.com/avatar/0eeaf53af64209dc60b475c49ed5a853?s=160" alt="Arnab Chakraborty" style="width: 160px; min-height: 160px" />
+</div>
+<hgroup>
+  <h1><a href="/">Arnab Chakraborty</a></h1>
+</hgroup>
+
+<p class="subtitle">A cognitive perspective on web.</p>
+<nav id="main-nav"><ul class="main-navigation clearfix">
+  <li>
+    <a href="/">Home</a></li>
+  <li>
+    <a href="/blog/archives">Archives</a></li>
+  <li>
+    <a href="/about">About</a>
+  </li>
+</ul>
+</nav>
+<nav id="sub-nav">
+	<div class="social">
+		
+    
+		
+    
+		
+		<a class="twitter" href="http://twitter.com/arnabc" title="Twitter">
+		  <i class="icon-twitter"></i>
+		</a>
+		
+    
+		
+		<a class="github" href="https://github.com/arnabc" title="GitHub">
+      <i class="icon-github"></i>
+    </a>
+		
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/arnabchakraborty1">
+		  <i class="icon-linkedin"></i>
+		</a>
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS"><i class="icon-rss"></i></a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+  	<h1 class="title" itemprop="name">Android - How to Send Gzipped JSON in HTTP Request</h1>
+  </header>
+	<div class="entry-content" itemprop="articleBody"><p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
+
+<!-- more -->
+
+
+<p>The <a href="http://developer.android.com/reference/android/net/http/AndroidHttpClient.html"><code>AndroidHttpClient</code></a> module offers a way to achieve this, when you&rsquo;re sending JSON requests you can gzip the content of the request params and add some necessary HTTP headers, which will provide a hint to your server that it has to decode the content before it is usable. Needless to say that this technique is not just limited to sending JSON, you can of course use it if you&rsquo;re sending CSV or text file over the network to server.</p>
+
+<p>I&rsquo;ll show a way how this can be done using a Rails backend (that&rsquo;s what I use), but I presume this should not be too difficult to implement in case you&rsquo;re not using Rails. I&rsquo;ll be using JSON as an example here:</p>
+
+<p>To encode or decode the JSON content you can use the following utility module in Android:</p>
+
+<figure class='code'><figcaption><span>util.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Util</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Converts an InputStream to String</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param is</span>
+</span><span class='line'><span class="cm">     * @return</span>
+</span><span class='line'><span class="cm">     * @throws IOException</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">streamToString</span><span class="o">(</span><span class="n">InputStream</span> <span class="n">content</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kt">byte</span><span class="o">[]</span> <span class="n">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">1024</span><span class="o">];</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">numRead</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>        <span class="n">ByteArrayOutputStream</span> <span class="n">baos</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ByteArrayOutputStream</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">while</span> <span class="o">((</span><span class="n">numRead</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="n">buffer</span><span class="o">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">baos</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">buffer</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">numRead</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">content</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">String</span><span class="o">(</span><span class="n">baos</span><span class="o">.</span><span class="na">toByteArray</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Compresses the content of the request parameters (as a string). Sets</span>
+</span><span class='line'><span class="cm">     * appropriate HTTP headers also so that the server can decode it properly.</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param context Context</span>
+</span><span class='line'><span class="cm">     * @param content The string request params, ideally JSON string</span>
+</span><span class='line'><span class="cm">     * @param postReq The HttpPost request object</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">setCompressedEntity</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">String</span> <span class="n">content</span><span class="o">,</span> <span class="n">HttpPost</span> <span class="n">postReq</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kt">byte</span><span class="o">[]</span> <span class="n">data</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="s">&quot;UTF-8&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// if the length of the data exceeds the minimum gzip size then only</span>
+</span><span class='line'>            <span class="c1">// gzip it else it&#39;s not required at all</span>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">content</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">AndroidHttpClient</span>
+</span><span class='line'>                  <span class="o">.</span><span class="na">getMinGzipSize</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getContentResolver</span><span class="o">()))</span> <span class="o">{</span>
+</span><span class='line'>                <span class="c1">// set necessary headers</span>
+</span><span class='line'>                <span class="n">postReq</span><span class="o">.</span><span class="na">setHeader</span><span class="o">(</span><span class="s">&quot;Content-Encoding&quot;</span><span class="o">,</span> <span class="s">&quot;gzip&quot;</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="c1">// Compressed entity itself checks for minimum gzip size</span>
+</span><span class='line'>            <span class="c1">// and if the content is shorter than that size then it</span>
+</span><span class='line'>            <span class="c1">// just returns a ByteArrayEntity</span>
+</span><span class='line'>            <span class="n">postReq</span><span class="o">.</span><span class="na">setEntity</span><span class="o">(</span><span class="n">AndroidHttpClient</span><span class="o">.</span><span class="na">getCompressedEntity</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="n">context</span><span class="o">.</span><span class="na">getContentResolver</span><span class="o">()));</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">UnsupportedEncodingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Extracts the response content. If the server response is compressed, then</span>
+</span><span class='line'><span class="cm">     * it transparently decompresses the content. In order to indicate to server</span>
+</span><span class='line'><span class="cm">     * that you can consume JSON response, use the following code to add the &quot;Accept&quot;</span>
+</span><span class='line'><span class="cm">     * header:</span>
+</span><span class='line'><span class="cm">     *</span>
+</span><span class='line'><span class="cm">     * AndroidHttpClient.modifyRequestToAcceptGzipResponse(HttpRequest request)</span>
+</span><span class='line'><span class="cm">     * </span>
+</span><span class='line'><span class="cm">     * @param response</span>
+</span><span class='line'><span class="cm">     *                   HttpResponse Object</span>
+</span><span class='line'><span class="cm">     * @return String content of the HttpResponse</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getIfCompressed</span><span class="o">(</span><span class="n">HttpResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">response</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class='line'>            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">AndroidHttpClient</span><span class="o">.</span><span class="na">getUngzippedContent</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">getEntity</span><span class="o">());</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nf">streamToString</span><span class="o">(</span><span class="n">is</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The HTTP header, which indicates to server that the request content is gzipped, is <code>Content-Encoding: gzip</code>. On the Rails side you can use the following <strong>Rack</strong> middleware to decode JSON requests (you can set your webserver for example nginx to do the encoding on JSON responses):</p>
+
+<p>A Rack middleware to decode the gzipped JSON, thanks to this <a href="https://gist.github.com/2109707">gist</a> by <a href="https://gist.github.com/relistan">relistan</a>:</p>
+
+<figure class='code'><figcaption><span>compressed_requests.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">CompressedRequests</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@app</span> <span class="o">=</span> <span class="n">app</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">method_handled?</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span><span class='line'>    <span class="o">!!</span><span class="p">(</span><span class="n">env</span><span class="o">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="o">]</span> <span class="o">=~</span> <span class="sr">/(POST|PUT)/</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">encoding_handled?</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span><span class='line'>    <span class="o">[</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="s1">&#39;deflate&#39;</span><span class="o">].</span><span class="n">include?</span> <span class="n">env</span><span class="o">[</span><span class="s1">&#39;HTTP_CONTENT_ENCODING&#39;</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">method_handled?</span><span class="p">(</span><span class="n">env</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">encoding_handled?</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">extracted</span> <span class="o">=</span> <span class="n">decode</span><span class="p">(</span><span class="n">env</span><span class="o">[</span><span class="s1">&#39;rack.input&#39;</span><span class="o">]</span><span class="p">,</span> <span class="n">env</span><span class="o">[</span><span class="s1">&#39;HTTP_CONTENT_ENCODING&#39;</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">env</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">&#39;HTTP_CONTENT_ENCODING&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">env</span><span class="o">[</span><span class="s1">&#39;CONTENT_LENGTH&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="n">extracted</span><span class="o">.</span><span class="n">length</span>
+</span><span class='line'>      <span class="n">env</span><span class="o">[</span><span class="s1">&#39;rack.input&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="no">StringIO</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">extracted</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="vi">@app</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">[</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">response</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">content_encoding</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">case</span> <span class="n">content_encoding</span>
+</span><span class='line'>      <span class="k">when</span> <span class="s1">&#39;gzip&#39;</span> <span class="k">then</span> <span class="ss">Zlib</span><span class="p">:</span><span class="ss">:GzipReader</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">input</span><span class="p">)</span><span class="o">.</span><span class="n">read</span>
+</span><span class='line'>      <span class="k">when</span> <span class="s1">&#39;deflate&#39;</span> <span class="k">then</span> <span class="ss">Zlib</span><span class="p">:</span><span class="ss">:Inflate</span><span class="o">.</span><span class="n">inflate</span><span class="p">(</span><span class="n">input</span><span class="o">.</span><span class="n">read</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now put this in somewhere in your Rails web application directory for example <code>lib/middleware</code>, just make sure that the file is loaded when Rails boots. To include the file in Rails&#8217; <strong>autoload</strong> path, add it like this:</p>
+
+<figure class='code'><figcaption><span>application.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">config</span><span class="o">.</span><span class="n">autoload_paths</span> <span class="o">+=</span> <span class="sx">%W(</span><span class="si">#{</span><span class="n">config</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="sx">/lib </span><span class="si">#{</span><span class="n">config</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="sx">/lib/middleware)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once that is done, then you need to add this tiny little Rack app as a middleware, and the important trick is to add it before the <code>ActionDispatch::ParamsParser</code> middleware in Rails 3:</p>
+
+<figure class='code'><figcaption><span>application.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Handle Compressed Requests, this middleware makes gzip content </span>
+</span><span class='line'><span class="c1"># handling transparent to the Rails stack</span>
+</span><span class='line'><span class="n">config</span><span class="o">.</span><span class="n">middleware</span><span class="o">.</span><span class="n">insert_before</span> <span class="ss">ActionDispatch</span><span class="p">:</span><span class="ss">:ParamsParser</span><span class="p">,</span> <span class="s2">&quot;CompressedRequests&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s all you need both on client and server to send and receive Gzipped content. If you&rsquo;re sending JSON from client and you wan&rsquo;t rails to interpret it as JSON, then don&rsquo;t forget to add <code>Content-Type: application/json</code> on your HTTP Request header.</p>
+
+<p>Happy coding! If you have anything to say feel free to contact me on Twitter <a href="http://twitter.com/arnabc">@arnabc</a></p>
+</div>
+
+</article>
+
+	
+
+
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2016 - Arnab Chakraborty -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="/javascripts/slash.js"></script>
+
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-28528371-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+<!-- Include github widget to display pro repo info -->
+
+<script src="/javascripts/jquery.githubRepoWidget.min.js"></script>
+
+
+		</div>
+	</div>
+</body>
+</html>

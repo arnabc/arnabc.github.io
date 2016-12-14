@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: gzip | Arnab Chakraborty]]></title>
+  <link href="http://arnabc.github.io/blog/categories/gzip/atom.xml" rel="self"/>
+  <link href="http://arnabc.github.io/"/>
+  <updated>2016-12-14T20:53:08+05:30</updated>
+  <id>http://arnabc.github.io/</id>
+  <author>
+    <name><![CDATA[Arnab Chakraborty]]></name>
+    <email><![CDATA[arnabc@webgyani.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Android - How to send gzipped JSON in HTTP request]]></title>
+    <link href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
+    <updated>2012-09-30T18:41:00+05:30</updated>
+    <id>http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
+    <content type="html"><![CDATA[<p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
+
+<!-- more -->
+
+
+<p>The <a href="http://developer.android.com/reference/android/net/http/AndroidHttpClient.html"><code>AndroidHttpClient</code></a> module offers a way to achieve this, when you&rsquo;re sending JSON requests you can gzip the content of the request params and add some necessary HTTP headers, which will provide a hint to your server that it has to decode the content before it is usable. Needless to say that this technique is not just limited to sending JSON, you can of course use it if you&rsquo;re sending CSV or text file over the network to server.</p>
+
+<p>I&rsquo;ll show a way how this can be done using a Rails backend (that&rsquo;s what I use), but I presume this should not be too difficult to implement in case you&rsquo;re not using Rails. I&rsquo;ll be using JSON as an example here:</p>
+
+<p>To encode or decode the JSON content you can use the following utility module in Android:</p>
+
+<p>``` java util.java
+public class Util {</p>
+
+<pre><code>/**
+ * Converts an InputStream to String
+ * 
+ * @param is
+ * @return
+ * @throws IOException
+ */
+public static String streamToString(InputStream content) throws IOException {
+    byte[] buffer = new byte[1024];
+    int numRead = 0;
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+    while ((numRead = content.read(buffer)) != -1) {
+        baos.write(buffer, 0, numRead);
+    }
+
+    content.close();
+
+    return new String(baos.toByteArray());
+}
+
+/**
+ * Compresses the content of the request parameters (as a string). Sets
+ * appropriate HTTP headers also so that the server can decode it properly.
+ * 
+ * @param context Context
+ * @param content The string request params, ideally JSON string
+ * @param postReq The HttpPost request object
+ * 
+ */
+public static void setCompressedEntity(Context context, String content, HttpPost postReq) {
+    try {
+        byte[] data = content.getBytes("UTF-8");
+
+        // if the length of the data exceeds the minimum gzip size then only
+        // gzip it else it's not required at all
+        if (content.length() &gt; AndroidHttpClient
+                .getMinGzipSize(context.getContentResolver())) {
+            // set necessary headers
+            postReq.setHeader("Content-Encoding", "gzip");
+        }
+
+        // Compressed entity itself checks for minimum gzip size
+        // and if the content is shorter than that size then it
+        // just returns a ByteArrayEntity
+        postReq.setEntity(AndroidHttpClient.getCompressedEntity(data, context.getContentResolver()));
+
+    } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+/**
+ * Extracts the response content. If the server response is compressed, then
+ * it transparently decompresses the content. In order to indicate to server
+ * that you can consume JSON response, use the following code to add the "Accept"
+ * header:
+ *
+ * AndroidHttpClient.modifyRequestToAcceptGzipResponse(HttpRequest request)
+ * 
+ * @param response
+ *                  HttpResponse Object
+ * @return String content of the HttpResponse
+ */
+public static String getIfCompressed(HttpResponse response) {
+    if (response == null)
+        return null;
+
+    try {
+        InputStream is = AndroidHttpClient.getUngzippedContent(response.getEntity());
+        return streamToString(is);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    return null;
+}
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<p>The HTTP header, which indicates to server that the request content is gzipped, is <code>Content-Encoding: gzip</code>. On the Rails side you can use the following <strong>Rack</strong> middleware to decode JSON requests (you can set your webserver for example nginx to do the encoding on JSON responses):</p>
+
+<p>A Rack middleware to decode the gzipped JSON, thanks to this <a href="https://gist.github.com/2109707">gist</a> by <a href="https://gist.github.com/relistan">relistan</a>:</p>
+
+<p>``` ruby compressed_requests.rb
+class CompressedRequests
+  def initialize(app)</p>
+
+<pre><code>@app = app
+</code></pre>
+
+<p>  end</p>
+
+<p>  def method_handled?(env)</p>
+
+<pre><code>!!(env['REQUEST_METHOD'] =~ /(POST|PUT)/)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def encoding_handled?(env)</p>
+
+<pre><code>['gzip', 'deflate'].include? env['HTTP_CONTENT_ENCODING']
+</code></pre>
+
+<p>  end</p>
+
+<p>  def call(env)</p>
+
+<pre><code>if method_handled?(env) &amp;&amp; encoding_handled?(env)
+  extracted = decode(env['rack.input'], env['HTTP_CONTENT_ENCODING'])
+
+  env.delete('HTTP_CONTENT_ENCODING')
+  env['CONTENT_LENGTH'] = extracted.length
+  env['rack.input'] = StringIO.new(extracted)
+end
+
+status, headers, response = @app.call(env)
+return [status, headers, response]
+</code></pre>
+
+<p>  end</p>
+
+<p>  def decode(input, content_encoding)</p>
+
+<pre><code>case content_encoding
+  when 'gzip' then Zlib::GzipReader.new(input).read
+  when 'deflate' then Zlib::Inflate.inflate(input.read)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now put this in somewhere in your Rails web application directory for example <code>lib/middleware</code>, just make sure that the file is loaded when Rails boots. To include the file in Rails' <strong>autoload</strong> path, add it like this:</p>
+
+<p><code>ruby application.rb
+config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
+</code></p>
+
+<p>Once that is done, then you need to add this tiny little Rack app as a middleware, and the important trick is to add it before the <code>ActionDispatch::ParamsParser</code> middleware in Rails 3:</p>
+
+<p>``` ruby application.rb</p>
+
+<h1>Handle Compressed Requests, this middleware makes gzip content</h1>
+
+<h1>handling transparent to the Rails stack</h1>
+
+<p>config.middleware.insert_before ActionDispatch::ParamsParser, &ldquo;CompressedRequests&rdquo;
+```</p>
+
+<p>That&rsquo;s all you need both on client and server to send and receive Gzipped content. If you&rsquo;re sending JSON from client and you wan&rsquo;t rails to interpret it as JSON, then don&rsquo;t forget to add <code>Content-Type: application/json</code> on your HTTP Request header.</p>
+
+<p>Happy coding! If you have anything to say feel free to contact me on Twitter <a href="http://twitter.com/arnabc">@arnabc</a></p>
+]]></content>
+  </entry>
+  
+</feed>
