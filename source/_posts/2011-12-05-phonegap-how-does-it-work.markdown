@@ -96,7 +96,7 @@ The following resouces can be useful for HTML5 based mobile apps development (no
 * [The M-Project](http://www.the-m-project.org/)
 * [Wink Toolkit](http://www.winktoolkit.org/)
 * [Zepto.js - JavaScript library for Webkit browsers](http://zeptojs.com)
-* [Backbone.JS - JavaScript MVC framework](http://documentcloud.github.com/backbone/)
+* [Backbone.JS - JavaScript MVC framework](http://backbonejs.org/)
 
 
 ## Conclusion
