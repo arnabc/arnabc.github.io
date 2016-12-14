@@ -68,3 +68,7 @@ You need to build your own backend infrastructure for distribution and remote ma
 ## Conclusion 
 Developing kiosk based applications are difficult but not impossible, the problem begins when you start to control the device's default functions, if you see that you need to completely lock-down a device then it is wiser that you go down the custom ROM path instead of trying to make it work in consumer grade Android phones.
 
+
+---
+Note: I have developed a generic Kiosk Management Solution called [MobiLock Pro](https://mobilock.in) which has the above functionality as well as many other features. If you want to have a fully managed Cloud Based Kiosk solution then do check out **MobiLock Pro**.
+---
