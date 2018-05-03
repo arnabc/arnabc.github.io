@@ -2,11 +2,11 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://arnab.ch
+url: https://arnab.ch
 title: Arnab Chakraborty
 subtitle: A cognitive perspective on web.
 author: Arnab Chakraborty
-simple_search: http://google.com/search
+simple_search: https://google.com/search
 description:
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
@@ -19,7 +19,7 @@ date_format: "ordinal"
 subscribe_rss: /atom.xml
 subscribe_email:
 # RSS feeds can list your email address if you like
-email: arnabc@webgyani.com
+email: me@arnab.ch
 
 # ----------------------- #
 #    Jekyll & Plugins     #
