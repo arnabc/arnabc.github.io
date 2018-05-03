@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Volley | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/volley/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/volley/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
+    <link href="https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
     <updated>2013-08-21T22:24:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
+    <id>https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
     <content type="html"><![CDATA[<p>Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster. The good thing about Volley is that it abstracts away the low level details of what HTTP client library is being used under the hood and helps you focus on writing nice and clean RESTful HTTP requests. Additionally all requests in Volley are executed asynchronously on a different thread without blocking your &ldquo;main thread&rdquo;.</p>
 
 <!-- more -->

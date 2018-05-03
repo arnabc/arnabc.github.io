@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: launcher | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/launcher/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/launcher/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
+    <link href="https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
     <updated>2013-08-16T14:54:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
+    <id>https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
     <content type="html"><![CDATA[<p>In Android the screen that appears when the phone starts is called &ldquo;Launcher Screen&rdquo;. It is possible in Android to write custom launcher apps which can be used as a replacement for the default launcher app that comes bundled with the phone. Developing a launcher app is no different than developing any other Android application, in fact both are same. In this post I&rsquo;ll share what you need to do to write your own custom launcher application.</p>
 
 <!-- more -->

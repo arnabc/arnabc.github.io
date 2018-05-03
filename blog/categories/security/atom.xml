@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Security, | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/security/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/security/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Danger of Using Same Password Everywhere]]></title>
-    <link href="http://arnabc.github.io/blog/2012/09/danger-of-using-same-password-everywhere/"/>
+    <link href="https://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere/"/>
     <updated>2012-09-01T23:23:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/09/danger-of-using-same-password-everywhere</id>
+    <id>https://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere</id>
     <content type="html"><![CDATA[<p>It has been said many times before by a lot of great people from the world of Computer Security and I am going to say it again, yes again, even though you don&rsquo;t like it!</p>
 
 <blockquote><p><big>Do not use same password everywhere</big></p></blockquote>

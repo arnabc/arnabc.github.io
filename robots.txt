@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://arnabc.github.io/sitemap.xml 
+Sitemap: https://arnab.ch/sitemap.xml 

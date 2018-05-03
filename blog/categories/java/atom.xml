@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Java | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/java/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/java/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
-    <link href="http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application/"/>
+    <link href="https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/"/>
     <updated>2012-01-21T00:26:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application</id>
+    <id>https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application</id>
     <content type="html"><![CDATA[<p>Well, the title of the post may not be descriptive enough of the complexity that we dealt with in one of our recent projects. Before I delve deeper into the actual problem, let me give you some background of what we&rsquo;re trying to achieve. We&rsquo;ve been working on an Android application for some time which is going to be installed in kiosks or in cabs mainly on Android tablets (currently Android 2.2 devices), basically this is a sort of in-cab entertainment system where you can listen to music, watch videos, latest movie trailers and promos, read latest news, search places and find them in maps. You may think what&rsquo;s so complicated about it? Well this app is an Android Homescreen application and this is going to be the only application that users can access from the tablets and above all it&rsquo;ll be <strong>remotely managed</strong>.</p>
 
 <p>The term <strong>remotely managed</strong> means that the app will be automatically updated over the air, there will be a provisioning server where the admins can publish/upload a new build, and that build will automatically be installed in the devices. Other than that the device can also be remotely restarted or shut down. The content that users can access or play using the app is stored in the device for faster access, and that content is synced (i.e. updated) periodically from a remote content syncing server. All of these are happening over the internet and the devices are equipped with a 3G chip, which makes it easier to download large amount of data with a decent network speed, else the content syncing would be a real pain. Below is the list of rough requirements that we had:</p>
@@ -118,7 +118,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#x6d;&#x61;&#105;&#108;&#116;&#111;&#58;&#97;&#114;&#x6e;&#97;&#x62;&#99;&#x40;&#x77;&#101;&#98;&#103;&#x79;&#x61;&#x6e;&#105;&#46;&#x63;&#x6f;&#109;">&#97;&#114;&#110;&#x61;&#x62;&#x63;&#64;&#x77;&#x65;&#98;&#103;&#121;&#x61;&#110;&#x69;&#x2e;&#x63;&#x6f;&#109;</a>, I&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#x61;&#114;&#110;&#x61;&#x62;&#x63;&#x40;&#119;&#101;&#x62;&#103;&#121;&#x61;&#110;&#x69;&#x2e;&#99;&#111;&#109;">&#x61;&#x72;&#110;&#97;&#x62;&#99;&#x40;&#x77;&#x65;&#98;&#103;&#121;&#x61;&#110;&#105;&#46;&#x63;&#111;&#109;</a>, I&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 

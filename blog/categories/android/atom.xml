@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Android | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/android/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/android/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
-    <link href="http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
+    <link href="https://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
     <updated>2013-11-17T11:40:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
+    <id>https://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
     <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges you&rsquo;ll face while developing these type of applications. This is a high-level overview of the effort involved, and not meant to provide code examples which will be beyond the scope of the post.</p>
 
 <!--more-->
@@ -109,9 +109,9 @@
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
+    <link href="https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
     <updated>2013-08-21T22:24:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
+    <id>https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
     <content type="html"><![CDATA[<p>Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster. The good thing about Volley is that it abstracts away the low level details of what HTTP client library is being used under the hood and helps you focus on writing nice and clean RESTful HTTP requests. Additionally all requests in Volley are executed asynchronously on a different thread without blocking your &ldquo;main thread&rdquo;.</p>
 
 <!-- more -->
@@ -1002,9 +1002,9 @@
   
   <entry>
     <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
+    <link href="https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
     <updated>2013-08-16T14:54:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
+    <id>https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
     <content type="html"><![CDATA[<p>In Android the screen that appears when the phone starts is called &ldquo;Launcher Screen&rdquo;. It is possible in Android to write custom launcher apps which can be used as a replacement for the default launcher app that comes bundled with the phone. Developing a launcher app is no different than developing any other Android application, in fact both are same. In this post I&rsquo;ll share what you need to do to write your own custom launcher application.</p>
 
 <!-- more -->
@@ -1688,9 +1688,9 @@
   
   <entry>
     <title type="html"><![CDATA[Android - How to send gzipped JSON in HTTP request]]></title>
-    <link href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
+    <link href="https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
     <updated>2012-09-30T18:41:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
+    <id>https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
     <content type="html"><![CDATA[<p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
 
 <!-- more -->
@@ -1870,9 +1870,9 @@ config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
   
   <entry>
     <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
-    <link href="http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application/"/>
+    <link href="https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/"/>
     <updated>2012-01-21T00:26:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application</id>
+    <id>https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application</id>
     <content type="html"><![CDATA[<p>Well, the title of the post may not be descriptive enough of the complexity that we dealt with in one of our recent projects. Before I delve deeper into the actual problem, let me give you some background of what we&rsquo;re trying to achieve. We&rsquo;ve been working on an Android application for some time which is going to be installed in kiosks or in cabs mainly on Android tablets (currently Android 2.2 devices), basically this is a sort of in-cab entertainment system where you can listen to music, watch videos, latest movie trailers and promos, read latest news, search places and find them in maps. You may think what&rsquo;s so complicated about it? Well this app is an Android Homescreen application and this is going to be the only application that users can access from the tablets and above all it&rsquo;ll be <strong>remotely managed</strong>.</p>
 
 <p>The term <strong>remotely managed</strong> means that the app will be automatically updated over the air, there will be a provisioning server where the admins can publish/upload a new build, and that build will automatically be installed in the devices. Other than that the device can also be remotely restarted or shut down. The content that users can access or play using the app is stored in the device for faster access, and that content is synced (i.e. updated) periodically from a remote content syncing server. All of these are happening over the internet and the devices are equipped with a 3G chip, which makes it easier to download large amount of data with a decent network speed, else the content syncing would be a real pain. Below is the list of rough requirements that we had:</p>
@@ -1973,7 +1973,7 @@ config.autoload_paths += %W(#{config.root}/lib #{config.root}/lib/middleware)
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#x61;&#114;&#x6e;&#x61;&#x62;&#99;&#x40;&#119;&#x65;&#98;&#103;&#x79;&#97;&#110;&#105;&#46;&#99;&#x6f;&#109;">&#x61;&#x72;&#110;&#x61;&#x62;&#99;&#x40;&#x77;&#x65;&#x62;&#103;&#x79;&#97;&#110;&#x69;&#x2e;&#x63;&#x6f;&#109;</a>, I&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#58;&#x61;&#114;&#110;&#97;&#x62;&#x63;&#64;&#119;&#x65;&#x62;&#x67;&#x79;&#97;&#110;&#105;&#x2e;&#x63;&#111;&#x6d;">&#x61;&#114;&#x6e;&#97;&#x62;&#x63;&#64;&#119;&#101;&#x62;&#103;&#121;&#x61;&#x6e;&#105;&#x2e;&#99;&#x6f;&#x6d;</a>, I&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 

@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Developing Kiosk Mode Applications in Android]]></title>
-    <link href="http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
+    <link href="https://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android/"/>
     <updated>2013-11-17T11:40:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
+    <id>https://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android</id>
     <content type="html"><![CDATA[<p>I have had my fair share of developing &ldquo;Kiosk Mode&rdquo; or &ldquo;Single Application Mode&rdquo; applications for Android. The idea is to run only one custom app and prevent any other applications to run (or only whitelisted applications). In this blog post I would like to share the approaches that you can take and the possible challenges you&rsquo;ll face while developing these type of applications. This is a high-level overview of the effort involved, and not meant to provide code examples which will be beyond the scope of the post.</p>
 
 <!--more-->
@@ -87,7 +87,7 @@
 
 <h4>Automatic Update</h4>
 
-<p>If you need automatic update support but don&rsquo;t want to distribute your app through Play Store, then you need to &ldquo;<strong>root</strong>&rdquo; the device and run a separate app which will update your app when there is a new version. This requires you to build a backend as well. I wrote a blog post on this topic some time ago, <a href="http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application/">Android auto-updating homescreen application</a>.</p>
+<p>If you need automatic update support but don&rsquo;t want to distribute your app through Play Store, then you need to &ldquo;<strong>root</strong>&rdquo; the device and run a separate app which will update your app when there is a new version. This requires you to build a backend as well. I wrote a blog post on this topic some time ago, <a href="https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/">Android auto-updating homescreen application</a>.</p>
 
 <h2>Building a custom ROM</h2>
 
@@ -109,9 +109,9 @@
   
   <entry>
     <title type="html"><![CDATA[Asynchronous HTTP requests in Android using Volley]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
+    <link href="https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/"/>
     <updated>2013-08-21T22:24:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
+    <id>https://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley</id>
     <content type="html"><![CDATA[<p>Volley is the new Swiss Army Knife of Android Developers, it provides some nice utilities which makes the networking for Android apps easier and faster. The good thing about Volley is that it abstracts away the low level details of what HTTP client library is being used under the hood and helps you focus on writing nice and clean RESTful HTTP requests. Additionally all requests in Volley are executed asynchronously on a different thread without blocking your &ldquo;main thread&rdquo;.</p>
 
 <!-- more -->
@@ -938,9 +938,9 @@
   
   <entry>
     <title type="html"><![CDATA[How to write custom launcher app in Android]]></title>
-    <link href="http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
+    <link href="https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android/"/>
     <updated>2013-08-16T14:54:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
+    <id>https://arnab.ch/blog/2013/08/how-to-write-custom-launcher-app-in-android</id>
     <content type="html"><![CDATA[<p>In Android the screen that appears when the phone starts is called &ldquo;Launcher Screen&rdquo;. It is possible in Android to write custom launcher apps which can be used as a replacement for the default launcher app that comes bundled with the phone. Developing a launcher app is no different than developing any other Android application, in fact both are same. In this post I&rsquo;ll share what you need to do to write your own custom launcher application.</p>
 
 <!-- more -->
@@ -1572,7 +1572,7 @@
 
 <p>For those who wants to investigate further, do take a look at the default launcher application code here: <a href="https://android.googlesource.com/platform/packages/apps/Launcher2/+/master/">Android Stock Launcher App</a></p>
 
-<p><strong>Update</strong>: I wrote another post which provides a high-level overview of what all things are required to develop a &ldquo;<strong>kiosk-mode</strong>&rdquo; Android application. You can check it out here &ndash; <a href="http://arnabc.github.io/blog/2013/11/developing-kiosk-mode-applications-in-android/">Developing kiosk-mode applications in Android</a></p>
+<p><strong>Update</strong>: I wrote another post which provides a high-level overview of what all things are required to develop a &ldquo;<strong>kiosk-mode</strong>&rdquo; Android application. You can check it out here &ndash; <a href="https://arnab.ch/blog/2013/11/developing-kiosk-mode-applications-in-android/">Developing kiosk-mode applications in Android</a></p>
 
 <p>You can download the full source code used in this article from this Github <a href="https://github.com/arnabc/simplelauncher/zipball/master">repository</a>.</p>
 
@@ -1587,9 +1587,9 @@
   
   <entry>
     <title type="html"><![CDATA[Android - How to send gzipped JSON in HTTP request]]></title>
-    <link href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
+    <link href="https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
     <updated>2012-09-30T18:41:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
+    <id>https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
     <content type="html"><![CDATA[<p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
 
 <!-- more -->
@@ -1867,9 +1867,9 @@
   
   <entry>
     <title type="html"><![CDATA[Danger of Using Same Password Everywhere]]></title>
-    <link href="http://arnabc.github.io/blog/2012/09/danger-of-using-same-password-everywhere/"/>
+    <link href="https://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere/"/>
     <updated>2012-09-01T23:23:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/09/danger-of-using-same-password-everywhere</id>
+    <id>https://arnab.ch/blog/2012/09/danger-of-using-same-password-everywhere</id>
     <content type="html"><![CDATA[<p>It has been said many times before by a lot of great people from the world of Computer Security and I am going to say it again, yes again, even though you don&rsquo;t like it!</p>
 
 <blockquote><p><big>Do not use same password everywhere</big></p></blockquote>
@@ -1909,9 +1909,9 @@
   
   <entry>
     <title type="html"><![CDATA[Android auto-updating homescreen application]]></title>
-    <link href="http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application/"/>
+    <link href="https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application/"/>
     <updated>2012-01-21T00:26:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/01/android-auto-updating-homescreen-application</id>
+    <id>https://arnab.ch/blog/2012/01/android-auto-updating-homescreen-application</id>
     <content type="html"><![CDATA[<p>Well, the title of the post may not be descriptive enough of the complexity that we dealt with in one of our recent projects. Before I delve deeper into the actual problem, let me give you some background of what we&rsquo;re trying to achieve. We&rsquo;ve been working on an Android application for some time which is going to be installed in kiosks or in cabs mainly on Android tablets (currently Android 2.2 devices), basically this is a sort of in-cab entertainment system where you can listen to music, watch videos, latest movie trailers and promos, read latest news, search places and find them in maps. You may think what&rsquo;s so complicated about it? Well this app is an Android Homescreen application and this is going to be the only application that users can access from the tablets and above all it&rsquo;ll be <strong>remotely managed</strong>.</p>
 
 <p>The term <strong>remotely managed</strong> means that the app will be automatically updated over the air, there will be a provisioning server where the admins can publish/upload a new build, and that build will automatically be installed in the devices. Other than that the device can also be remotely restarted or shut down. The content that users can access or play using the app is stored in the device for faster access, and that content is synced (i.e. updated) periodically from a remote content syncing server. All of these are happening over the internet and the devices are equipped with a 3G chip, which makes it easier to download large amount of data with a decent network speed, else the content syncing would be a real pain. Below is the list of rough requirements that we had:</p>
@@ -1954,7 +1954,7 @@
 
 <p>This service is the crux of this application, it acts as a &ldquo;remote control&rdquo; to manage the device as well as our homescreen application. We decided to build it as a separate app not part of the homescreen application, because this app is not going to have any GUI. So how does this work? Below is the rough diagram of it&rsquo;s architecture:</p>
 
-<p><img src="http://arnabc.github.io/images/updater-service-sequence-diagram.png" alt="Updater Service Sequence Diagram" /></p>
+<p><img src="https://arnab.ch/images/updater-service-sequence-diagram.png" alt="Updater Service Sequence Diagram" /></p>
 
 <p>In the above diagram, our Updater app is started whenever the device is rebooted (as per our installation process, we reboot the device after installing the update service app), it sets up a repeating alarm using a <em>PendingIntent</em>, which is invoked after a certain period of time, in the mean time it also makes a quick request to the provisioning server for any available update. If there&rsquo;s an update then the UpdateService downloads the APK (link provided in the update check response) and once it&rsquo;s downloaded (stored in the SDcard) it then fires up an intent to start the PackageInstaller and gives the APK file path as part of the intent payload. The PackageInstaller then runs the <code>pm install -r &lt;apkPath&gt;</code> command with <code>su</code> privilege. In order to execute the commands as <em>root</em> I used a modified version of the <a href="http://muzikant-android.blogspot.com/2011/02/how-to-get-root-access-and-execute.html">excellent piece of code available from here</a>. Once the installation process is complete we notify the backend server that the device has been updated with the latest app (by the way it may already be clear to you that the provisioning server has the list of devices running in the wild and knows which device is running what version of the app). Anyway, this cycle of checking for updates continues as every time the alarm fires or the device is rebooted.</p>
 
@@ -2008,7 +2008,7 @@
 
 <p>Similarly to the update service above, the Content Syncing part is also a separate app without a GUI, it gets started on RECEIVE_BOOT_COMPLETED intent and checks for updated content once a day. We download a pretty large amount of data which can range anywhere from 100MB-1GB. Below is the sequence diagram of the rough architecture that we have:</p>
 
-<p><img src="http://arnabc.github.io/images/content-sync-sequence-diagram.png" alt="Content Sync Sequence Diagram" /></p>
+<p><img src="https://arnab.ch/images/content-sync-sequence-diagram.png" alt="Content Sync Sequence Diagram" /></p>
 
 <p>Once the download sync is complete, the app sends an Intent notifying the Main homescreen application about the content update so that it can display a friendly message to the user in case the device content is being used/played at that time. The main app stores some of the data in memory or in a SQLite database when it starts, so in order to cleanly rebuild that entire data structure we&rsquo;re currently rebooting the device. But in future <em>we&rsquo;re planning to avoid it, so that the content update does not need a reboot</em>.</p>
 
@@ -2016,7 +2016,7 @@
 
 <p>This project has helped us gain a lot of valuable knowledge and insight into the Android platform and development practices as a whole. It has been a tremendous learning exercise for all of us. Even though the project is nearing completion, there are still some cases where we can optimize a bit, for example if you have gone through the above diagrams then you may have realized that the flows can be simplified even further by introducing <strong>Android Push Messaging (C2DM)</strong>, this we&rsquo;ll do sometime in later months, and as we already have the provisioning server in place then it&rsquo;s just a matter of time that we develop the feaures and push it to the wild.</p>
 
-<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#97;&#114;&#x6e;&#x61;&#98;&#99;&#64;&#x77;&#101;&#x62;&#x67;&#121;&#97;&#x6e;&#105;&#x2e;&#x63;&#111;&#x6d;">&#x61;&#114;&#110;&#97;&#x62;&#99;&#64;&#x77;&#x65;&#x62;&#x67;&#x79;&#x61;&#110;&#105;&#46;&#99;&#x6f;&#x6d;</a>, I&rsquo;d be happy to help you.</p>
+<p>On a closing note, if you want to build an app like this, then you can get in touch with me at <a href="&#109;&#97;&#x69;&#x6c;&#x74;&#111;&#x3a;&#x61;&#x72;&#x6e;&#97;&#98;&#x63;&#64;&#119;&#x65;&#x62;&#103;&#121;&#x61;&#x6e;&#105;&#46;&#x63;&#x6f;&#109;">&#x61;&#114;&#110;&#97;&#x62;&#99;&#64;&#119;&#101;&#x62;&#103;&#x79;&#97;&#110;&#105;&#46;&#99;&#x6f;&#109;</a>, I&rsquo;d be happy to help you.</p>
 
 <p>Thanks for reading!</p>
 
@@ -2028,9 +2028,9 @@
   
   <entry>
     <title type="html"><![CDATA[PhoneGap - How does it work]]></title>
-    <link href="http://arnabc.github.io/blog/2011/12/phonegap-how-does-it-work/"/>
+    <link href="https://arnab.ch/blog/2011/12/phonegap-how-does-it-work/"/>
     <updated>2011-12-05T00:47:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2011/12/phonegap-how-does-it-work</id>
+    <id>https://arnab.ch/blog/2011/12/phonegap-how-does-it-work</id>
     <content type="html"><![CDATA[<p>PhoneGap is an open-source cross-platform Mobile Application development framework by Nitobi Software (now Adobe) which allows web developers to build mobile apps using HTML, CSS and JavaScript.</p>
 
 <p>The PhoneGap project has been moved to Apache Incubator and now it is known as &ldquo;Apache Callback&rdquo;. PhoneGap project is divided into several sub-projects where each one represents a separate platform. In order to develop for iPhone and iPad, you need Mac OSX and XCode installed, similarly for Android you need Google Android SDK, Eclipse ADT Plugin, Ant as well as Eclipse IDE.</p>
@@ -2078,7 +2078,7 @@
 
 <p>The following diagram explains how does a PhoneGap architecture look like:</p>
 
-<p><img src="http://arnabc.github.io/images/phonegap-architecture.jpg" alt="PhoneGap Architecture" /></p>
+<p><img src="https://arnab.ch/images/phonegap-architecture.jpg" alt="PhoneGap Architecture" /></p>
 
 <p>In the above dialogram we can see that PhoneGap provides a &ldquo;WebView&rdquo; which is nothing but a bare bone web browser without a Chrome UI. The native code in PhoneGap SDK exposes uniform APIs across multiple device platforms which are accessible to JavaScript running inside the WebView.</p>
 
@@ -2145,9 +2145,9 @@
   
   <entry>
     <title type="html"><![CDATA["new" Operator in JavaScript]]></title>
-    <link href="http://arnabc.github.io/blog/2010/04/new-operator-in-javascript/"/>
+    <link href="https://arnab.ch/blog/2010/04/new-operator-in-javascript/"/>
     <updated>2010-04-20T09:10:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2010/04/new-operator-in-javascript</id>
+    <id>https://arnab.ch/blog/2010/04/new-operator-in-javascript</id>
     <content type="html"><![CDATA[<p>In JavaScript, there’s an operator called <code>new</code> which we use to create an instance of an object (i.e Constructor function). So, what does <strong>new</strong> do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the <strong>new</strong> operator.</p>
 
 <!--more-->
@@ -2197,9 +2197,9 @@
   
   <entry>
     <title type="html"><![CDATA[10 things a FrontEnd Engineer should know]]></title>
-    <link href="http://arnabc.github.io/blog/2010/01/10-things-a-frontend-engineer-should-know/"/>
+    <link href="https://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know/"/>
     <updated>2010-01-10T22:33:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2010/01/10-things-a-frontend-engineer-should-know</id>
+    <id>https://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know</id>
     <content type="html"><![CDATA[<p>Frontend engineering as it stands today is a bit of vague and unspecified territory, it’s still not clearly understood may be because of the lack of clarity around stuffs a frontend engineer does. To simply put, frontend engineering means understanding the browsers best, the work of a frontend engineer is what you see when you do “view source”. So, how can you become a frontend engineer? In this post I’ll list down some of the things that a would be frontend engineer should know about. Frontend engineers write software using HTML, CSS and JavaScript, and yes I meant ‘writing software’, because if you look at modern day web applications like Gmail, Yahoo! Mail, Google Wave all are complex applications which involves significant amount of JavaScript, CSS, HTML and other technologies. So basically it means a frontend engineer should be specialized in HTML, CSS and JavaScript. </p> <!--more--></p>
 
 <p>Below are the list of things that I would expect to see in a would be frontend engineer:</p>

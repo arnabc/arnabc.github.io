@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: JavaScript | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/javascript/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA["new" Operator in JavaScript]]></title>
-    <link href="http://arnabc.github.io/blog/2010/04/new-operator-in-javascript/"/>
+    <link href="https://arnab.ch/blog/2010/04/new-operator-in-javascript/"/>
     <updated>2010-04-20T09:10:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2010/04/new-operator-in-javascript</id>
+    <id>https://arnab.ch/blog/2010/04/new-operator-in-javascript</id>
     <content type="html"><![CDATA[<p>In JavaScript, there’s an operator called <code>new</code> which we use to create an instance of an object (i.e Constructor function). So, what does <strong>new</strong> do? Well, it ensures that you always get an object when you use it with a constructor function. By the way, there’s no difference between a constructor function and a normal function, both are same. The term constructor function is used to indicate that we can create an object of that type using the <strong>new</strong> operator.</p>
 
 <!--more-->
@@ -77,9 +77,9 @@
   
   <entry>
     <title type="html"><![CDATA[10 things a FrontEnd Engineer should know]]></title>
-    <link href="http://arnabc.github.io/blog/2010/01/10-things-a-frontend-engineer-should-know/"/>
+    <link href="https://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know/"/>
     <updated>2010-01-10T22:33:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2010/01/10-things-a-frontend-engineer-should-know</id>
+    <id>https://arnab.ch/blog/2010/01/10-things-a-frontend-engineer-should-know</id>
     <content type="html"><![CDATA[<p>Frontend engineering as it stands today is a bit of vague and unspecified territory, it’s still not clearly understood may be because of the lack of clarity around stuffs a frontend engineer does. To simply put, frontend engineering means understanding the browsers best, the work of a frontend engineer is what you see when you do “view source”. So, how can you become a frontend engineer? In this post I’ll list down some of the things that a would be frontend engineer should know about. Frontend engineers write software using HTML, CSS and JavaScript, and yes I meant ‘writing software’, because if you look at modern day web applications like Gmail, Yahoo! Mail, Google Wave all are complex applications which involves significant amount of JavaScript, CSS, HTML and other technologies. So basically it means a frontend engineer should be specialized in HTML, CSS and JavaScript. </p> <!--more--></p>
 
 <p>Below are the list of things that I would expect to see in a would be frontend engineer:</p>

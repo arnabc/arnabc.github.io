@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: HTML5 | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/html5/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/html5/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[PhoneGap - How does it work]]></title>
-    <link href="http://arnabc.github.io/blog/2011/12/phonegap-how-does-it-work/"/>
+    <link href="https://arnab.ch/blog/2011/12/phonegap-how-does-it-work/"/>
     <updated>2011-12-05T00:47:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2011/12/phonegap-how-does-it-work</id>
+    <id>https://arnab.ch/blog/2011/12/phonegap-how-does-it-work</id>
     <content type="html"><![CDATA[<p>PhoneGap is an open-source cross-platform Mobile Application development framework by Nitobi Software (now Adobe) which allows web developers to build mobile apps using HTML, CSS and JavaScript.</p>
 
 <p>The PhoneGap project has been moved to Apache Incubator and now it is known as &ldquo;Apache Callback&rdquo;. PhoneGap project is divided into several sub-projects where each one represents a separate platform. In order to develop for iPhone and iPad, you need Mac OSX and XCode installed, similarly for Android you need Google Android SDK, Eclipse ADT Plugin, Ant as well as Eclipse IDE.</p>

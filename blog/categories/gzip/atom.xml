@@ -2,22 +2,22 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: gzip | Arnab Chakraborty]]></title>
-  <link href="http://arnabc.github.io/blog/categories/gzip/atom.xml" rel="self"/>
-  <link href="http://arnabc.github.io/"/>
-  <updated>2016-12-14T21:00:44+05:30</updated>
-  <id>http://arnabc.github.io/</id>
+  <link href="https://arnab.ch/blog/categories/gzip/atom.xml" rel="self"/>
+  <link href="https://arnab.ch/"/>
+  <updated>2018-05-03T13:04:09+05:30</updated>
+  <id>https://arnab.ch/</id>
   <author>
     <name><![CDATA[Arnab Chakraborty]]></name>
-    <email><![CDATA[arnabc@webgyani.com]]></email>
+    <email><![CDATA[me@arnab.ch]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Android - How to send gzipped JSON in HTTP request]]></title>
-    <link href="http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
+    <link href="https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request/"/>
     <updated>2012-09-30T18:41:00+05:30</updated>
-    <id>http://arnabc.github.io/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
+    <id>https://arnab.ch/blog/2012/09/android-how-to-send-gzipped-json-in-http-request</id>
     <content type="html"><![CDATA[<p>If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).</p>
 
 <!-- more -->
