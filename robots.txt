@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: 
-
-Sitemap: https://arnab.ch/sitemap.xml 
