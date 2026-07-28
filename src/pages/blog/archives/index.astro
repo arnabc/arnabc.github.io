@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { postUrl } from '../../../lib/postUrl';
+import { site } from '../../../site.config';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const postsByYear = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getUTCFullYear();
+  postsByYear.set(year, [...(postsByYear.get(year) ?? []), post]);
+}
+const years = [...postsByYear.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="Archives" description={`All posts by ${site.author}, organized by year.`}>
+  <h1>Archives</h1>
+  {years.map((year) => (
+    <section>
+      <h2>{year}</h2>
+      <ul class="post-list">
+        {postsByYear.get(year)!.map((post) => (
+          <li>
+            <a href={postUrl(post)}>{post.data.title}</a>
+            <time datetime={post.data.date.toISOString()}>
+              {post.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' })}
+            </time>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+  }
+
+  .post-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-list time {
+    color: var(--muted);
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+</style>

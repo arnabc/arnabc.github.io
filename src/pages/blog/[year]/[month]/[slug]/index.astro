@@ -1,0 +1,64 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../../../layouts/BaseLayout.astro';
+import { tagUrl } from '../../../../../lib/postUrl';
+import { site } from '../../../../../site.config';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+  return posts.map((post) => {
+    const year = String(post.data.date.getUTCFullYear());
+    const month = String(post.data.date.getUTCMonth() + 1).padStart(2, '0');
+
+    return {
+      params: { year, month, slug: post.id },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  author: {
+    '@type': 'Person',
+    name: site.author,
+  },
+};
+---
+
+<BaseLayout title={post.data.title} description={post.data.description} jsonLd={jsonLd}>
+  <article>
+    <header>
+      <h1>{post.data.title}</h1>
+      <p>
+        <time datetime={post.data.date.toISOString()}>
+          {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+        </time>
+      </p>
+    </header>
+    <div class="entry-content">
+      <Content />
+    </div>
+    {post.data.tags.length > 0 && (
+      <footer>
+        <p>
+          Tagged:
+          {post.data.tags.map((tag) => (
+            <>
+              {' '}
+              <a href={tagUrl(tag)}>{tag}</a>
+            </>
+          ))}
+        </p>
+      </footer>
+    )}
+  </article>
+</BaseLayout>

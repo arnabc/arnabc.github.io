@@ -1,0 +1,288 @@
+---
+import { site } from '../site.config';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, jsonLd } = Astro.props;
+const siteTitle = site.title;
+const pageTitle = title === siteTitle ? title : `${title} — ${siteTitle}`;
+const cfBeaconToken = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="alternate" type="application/atom+xml" title={siteTitle} href="/atom.xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="generator" content={Astro.generator} />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {cfBeaconToken && (
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+      />
+    )}
+    <script is:inline>
+      const stored = localStorage.getItem('theme');
+      if (stored) document.documentElement.setAttribute('data-theme', stored);
+    </script>
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <a class="site-title" href="/">{siteTitle}</a>
+        <nav aria-label="Main navigation">
+          <a href="/blog/archives/">Archives</a>
+          <a href="/about/">About</a>
+          <a href="/atom.xml">RSS</a>
+          <button id="theme-toggle" type="button" aria-label="Toggle dark mode">◐</button>
+        </nav>
+      </header>
+
+      <div class="layout">
+        <main>
+          <slot />
+        </main>
+        <aside class="sidebar">
+          <slot name="sidebar">
+            <p>{site.tagline}</p>
+          </slot>
+        </aside>
+      </div>
+
+      <footer class="site-footer">
+        <p>&copy; {new Date().getFullYear()} {siteTitle}</p>
+      </footer>
+    </div>
+
+    <script is:inline>
+      const toggle = document.getElementById('theme-toggle');
+      toggle?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const current = root.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : current === 'light' ? null : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
+        if (next) {
+          root.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+        } else {
+          root.removeAttribute('data-theme');
+          localStorage.removeItem('theme');
+        }
+      });
+    </script>
+
+    <style is:global>
+      .shiki,
+      .shiki span {
+        color: var(--shiki-light);
+        background-color: var(--shiki-light-bg) !important;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .shiki,
+        .shiki span {
+          color: var(--shiki-dark);
+          background-color: var(--shiki-dark-bg) !important;
+        }
+      }
+
+      :root[data-theme='dark'] .shiki,
+      :root[data-theme='dark'] .shiki span {
+        color: var(--shiki-dark);
+        background-color: var(--shiki-dark-bg) !important;
+      }
+
+      :root[data-theme='light'] .shiki,
+      :root[data-theme='light'] .shiki span {
+        color: var(--shiki-light);
+        background-color: var(--shiki-light-bg) !important;
+      }
+
+      .shiki {
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+    </style>
+
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #1a1a1a;
+        --muted: #666666;
+        --border: #e2e2e2;
+        --link: #0056b3;
+        --code-bg: #f5f5f5;
+        color-scheme: light;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #121212;
+          --fg: #e8e8e8;
+          --muted: #a0a0a0;
+          --border: #2e2e2e;
+          --link: #6fb1ff;
+          --code-bg: #1e1e1e;
+          color-scheme: dark;
+        }
+      }
+
+      :root[data-theme='dark'] {
+        --bg: #121212;
+        --fg: #e8e8e8;
+        --muted: #a0a0a0;
+        --border: #2e2e2e;
+        --link: #6fb1ff;
+        --code-bg: #1e1e1e;
+        color-scheme: dark;
+      }
+
+      :root[data-theme='light'] {
+        --bg: #ffffff;
+        --fg: #1a1a1a;
+        --muted: #666666;
+        --border: #e2e2e2;
+        --link: #0056b3;
+        --code-bg: #f5f5f5;
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+      }
+
+      .page {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100vh;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      .site-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .site-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--fg);
+        text-decoration: none;
+      }
+
+      .site-header nav {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+
+      .site-header nav a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+
+      .site-header nav a:hover {
+        color: var(--link);
+      }
+
+      #theme-toggle {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--fg);
+        cursor: pointer;
+        padding: 0.2rem 0.5rem;
+        font-size: 1rem;
+        line-height: 1;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 220px;
+        gap: 3rem;
+        padding: 2rem 0;
+      }
+
+      @media (max-width: 700px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .sidebar {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      a {
+        color: var(--link);
+      }
+
+      pre {
+        background: var(--code-bg);
+        padding: 1rem;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+
+      code {
+        background: var(--code-bg);
+        padding: 0.15em 0.35em;
+        border-radius: 3px;
+        font-size: 0.9em;
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+      }
+
+      blockquote {
+        border-left: 3px solid var(--border);
+        margin-left: 0;
+        padding-left: 1rem;
+        color: var(--muted);
+      }
+
+      .site-footer {
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+    </style>
+  </body>
+</html>
