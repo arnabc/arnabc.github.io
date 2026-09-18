@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./typography.css";
+@import "rehype-callouts/theme/obsidian";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --nav-height: 62px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* Headings carry the sans face at full strength; body copy sits a step
+     below on the opacity ladder. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-foreground font-bold;
+    font-family: var(--font-sans);
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+
+  a,
+  button,
+  summary,
+  [role="button"] {
+    @apply outline-accent/50 outline-offset-2 focus-visible:outline-2;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    @apply bg-fill text-fill-foreground;
+  }
+}
+
+/* The content column: a lighter surface sitting on the page tint, with
+   hairline edges. This is what gives the site its "sheet of paper" feel. */
+@utility site-shell {
+  @apply bg-background border-border mx-auto w-full max-w-3xl border-x;
+}
+
+@utility app-layout {
+  @apply mx-auto w-full px-5 sm:px-8;
+}
+
+/* Small uppercase mono labels — dates, tag counts, section eyebrows. */
+@utility label-mono {
+  font-family: var(--font-mono);
+  @apply text-label text-[11.5px] tracking-[0.12em] uppercase;
+}
+
+@utility hairline {
+  @apply border-border border-t;
+}
+
+/* Replaces AstroPaper's wavy underline: a flat accent rule under the
+   active nav item, matching the reference's quieter chrome. */
+@utility active-nav {
+  @apply text-foreground relative;
+
+  &::after {
+    @apply bg-accent absolute inset-x-1 -bottom-1 h-px content-[''];
+  }
+}
+
+@utility card-surface {
+  @apply border-border rounded-(--radius) border;
+}
+
+:target {
+  scroll-margin-block: calc(var(--nav-height) + 1rem);
+}

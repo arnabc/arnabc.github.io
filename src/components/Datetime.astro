@@ -1,0 +1,47 @@
+---
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import config from "@/config";
+import { useTranslations } from "@/i18n";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+type Props = {
+  class?: string;
+  size?: "sm" | "lg";
+  pubDatetime: string | Date;
+  timezone?: string;
+  modDatetime?: string | Date | null;
+};
+
+const {
+  pubDatetime,
+  modDatetime,
+  size = "sm",
+  class: className = "",
+  timezone: postTimezone,
+} = Astro.props;
+
+const t = useTranslations(Astro.currentLocale);
+
+const isModified = modDatetime && modDatetime > pubDatetime;
+
+const datetime = dayjs(isModified ? modDatetime : pubDatetime).tz(
+  postTimezone ?? config.site.timezone
+);
+
+const date = datetime.format("D MMM, YYYY");
+---
+
+<div
+  class:list={[
+    "label-mono flex items-center gap-x-2",
+    { "text-[12.5px] tracking-[0.1em]": size === "lg" },
+    className,
+  ]}
+>
+  {isModified && <span>{t.post.updatedAt}</span>}
+  <time datetime={datetime.toISOString()}>{date}</time>
+</div>

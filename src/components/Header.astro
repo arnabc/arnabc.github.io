@@ -1,0 +1,202 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
+import IconArchive from "@/assets/icons/IconArchive.svg";
+import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
+import IconSearch from "@/assets/icons/IconSearch.svg";
+import IconMoon from "@/assets/icons/IconMoon.svg";
+import IconX from "@/assets/icons/IconX.svg";
+import LinkButton from "./LinkButton.astro";
+import { stripBase, stripLocale } from "@/utils/withBase";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const { site, features } = config;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+
+// Strip the base prefix so isActive comparisons work regardless of deploy subdirectory.
+// e.g. with base "/site": "/site/blog/slug" → "/blog/slug"
+const relativePath = stripBase(Astro.url.pathname);
+const pathWithoutTrailingSlash =
+  relativePath.endsWith("/") && relativePath !== "/"
+    ? relativePath.slice(0, -1)
+    : relativePath;
+
+const currentPath = stripLocale(pathWithoutTrailingSlash, locale);
+
+// Compares as many leading segments as `path` has, so nested routes under
+// /blog/ (categories, archives) don't all match the same single segment.
+const isActive = (path: string) => {
+  const currentPathArray = currentPath.split("/").filter(p => p.trim());
+  const pathArray = path.split("/").filter(p => p.trim());
+  return (
+    currentPath === path ||
+    pathArray.every((segment, i) => currentPathArray[i] === segment)
+  );
+};
+
+// "Posts" nav is active on /blog and post-detail pages, but not on the more
+// specific /blog/archives or /blog/categories sections nested under it.
+const isBlogHome =
+  isActive("/blog") &&
+  !isActive("/blog/archives") &&
+  !isActive("/blog/categories");
+
+const iconLink = "text-subtle hover:text-foreground relative grid size-8 place-items-center transition-colors";
+---
+
+<a
+  id="skip-to-content"
+  href="#main-content"
+  class="bg-background text-foreground border-border rounded-(--radius) absolute inset-s-8 -top-full z-50 border px-3 py-2 transition-all focus:top-4"
+>
+  {t.a11y.skipToContent}
+</a>
+
+<header
+  class="bg-background/85 border-border sticky top-0 z-40 border-b backdrop-blur-md"
+>
+  <div
+    class="app-layout flex flex-col sm:h-(--nav-height) sm:flex-row sm:items-center sm:justify-between"
+  >
+    <div class="flex items-center justify-between py-4 sm:py-0">
+      <a
+        href={getRelativeLocaleUrl(locale, "")}
+        class="text-foreground hover:text-foreground/80 text-[15px] font-bold tracking-[-0.01em] whitespace-nowrap transition-colors"
+      >
+        {site.title}
+      </a>
+      <button
+        id="menu-btn"
+        class="text-subtle hover:text-foreground -me-2 p-2 sm:hidden"
+        aria-label={t.a11y.openMenu}
+        aria-expanded="false"
+        aria-controls="menu-items"
+        data-label-open={t.a11y.openMenu}
+        data-label-close={t.a11y.closeMenu}
+      >
+        <IconX id="close-icon" class="hidden size-5" />
+        <IconMenuDeep id="menu-icon" class="size-5" />
+      </button>
+    </div>
+
+    <nav id="nav-menu" class="sm:flex sm:items-center">
+      <ul
+        id="menu-items"
+        class="border-border hidden flex-col gap-y-1 border-t py-3 sm:flex sm:flex-row sm:items-center sm:gap-x-1 sm:border-t-0 sm:py-0"
+      >
+        <li>
+          <a
+            href={getRelativeLocaleUrl(locale, "blog")}
+            class:list={[
+              "text-subtle hover:text-foreground block px-3 py-2 text-sm font-medium transition-colors sm:py-1",
+              { "active-nav": isBlogHome },
+            ]}
+          >
+            {t.nav.posts}
+          </a>
+        </li>
+        <li>
+          <a
+            href={getRelativeLocaleUrl(locale, "blog/categories")}
+            class:list={[
+              "text-subtle hover:text-foreground block px-3 py-2 text-sm font-medium transition-colors sm:py-1",
+              { "active-nav": isActive("/blog/categories") },
+            ]}
+          >
+            {t.nav.tags}
+          </a>
+        </li>
+        <li>
+          <a
+            href={getRelativeLocaleUrl(locale, "about")}
+            class:list={[
+              "text-subtle hover:text-foreground block px-3 py-2 text-sm font-medium transition-colors sm:py-1",
+              { "active-nav": isActive("/about") },
+            ]}
+          >
+            {t.nav.about}
+          </a>
+        </li>
+
+        <li class="flex items-center gap-x-1 px-2 pt-2 sm:ms-2 sm:pt-0 sm:ps-3 sm:border-s sm:border-border">
+          {
+            features.showArchives && (
+              <LinkButton
+                href={getRelativeLocaleUrl(locale, "blog/archives")}
+                class:list={[
+                  iconLink,
+                  { "text-foreground": isActive("/blog/archives") },
+                ]}
+                title={t.nav.archives}
+                aria-label={t.nav.archives}
+              >
+                <IconArchive class="size-5" />
+                <span class="sr-only">{t.nav.archives}</span>
+              </LinkButton>
+            )
+          }
+          {
+            features.search !== false && (
+              <LinkButton
+                href={getRelativeLocaleUrl(locale, "search")}
+                class:list={[iconLink, { "text-foreground": isActive("/search") }]}
+                title={t.nav.search}
+                aria-label={t.nav.search}
+              >
+                <IconSearch class="size-5" />
+                <span class="sr-only">{t.nav.search}</span>
+              </LinkButton>
+            )
+          }
+          {
+            features.lightAndDarkMode && (
+              <button
+                id="theme-btn"
+                class:list={[iconLink, "hover:bg-hover rounded-(--radius)"]}
+                title={t.a11y.toggleTheme}
+                aria-label="auto"
+                aria-live="polite"
+              >
+                <IconMoon class="absolute size-5 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                <IconSunHigh class="absolute size-5 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+              </button>
+            )
+          }
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  function toggleNav() {
+    const menuBtn = document.querySelector<HTMLButtonElement>("#menu-btn");
+    const menuItems = document.querySelector("#menu-items");
+    const menuIcon = document.querySelector("#menu-icon");
+    const closeIcon = document.querySelector("#close-icon");
+
+    if (!menuBtn || !menuItems || !menuIcon || !closeIcon) return;
+
+    const openLabel = menuBtn.dataset.labelOpen ?? "Open menu";
+    const closeLabel = menuBtn.dataset.labelClose ?? "Close menu";
+
+    menuBtn.addEventListener("click", () => {
+      const openMenu = menuBtn.getAttribute("aria-expanded") === "true";
+
+      menuBtn.setAttribute("aria-expanded", openMenu ? "false" : "true");
+      menuBtn.setAttribute("aria-label", openMenu ? openLabel : closeLabel);
+
+      menuItems.classList.toggle("hidden");
+      menuItems.classList.toggle("flex");
+      menuIcon.classList.toggle("hidden");
+      closeIcon.classList.toggle("hidden");
+    });
+  }
+
+  toggleNav();
+
+  document.addEventListener("astro:after-swap", toggleNav);
+</script>

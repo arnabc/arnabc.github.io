@@ -10,7 +10,7 @@ import { createHighlighter, createJavaScriptRegexEngine } from 'shiki';
 let highlighterPromise;
 function getHighlighter() {
   highlighterPromise ??= createHighlighter({
-    themes: ['github-light', 'github-dark'],
+    themes: ['min-light', 'night-owl'],
     langs: ['javascript', 'xml', 'java', 'bash', 'sh', 'ruby', 'text'],
     engine: createJavaScriptRegexEngine(),
   });
@@ -27,7 +27,7 @@ export default defineMarkdocConfig({
         const highlighter = await getHighlighter();
         const html = highlighter.codeToHtml(content, {
           lang: highlighter.getLoadedLanguages().includes(language) ? language : 'text',
-          themes: { light: 'github-light', dark: 'github-dark' },
+          themes: { light: 'min-light', dark: 'night-owl' },
           defaultColor: false,
         });
         return unescapeHTML(html);

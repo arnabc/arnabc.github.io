@@ -1,5 +1,5 @@
 {
-  "name": "arnabc.github.io",
+  "name": "astro-markdoc-keystatic-blog-template",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -8,25 +8,48 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro check && astro build && pagefind --site dist/client && cp -r dist/client/pagefind public/",
     "preview": "astro preview",
+    "sync": "astro sync",
     "astro": "astro",
     "generate-types": "wrangler types",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^14.1.5",
+    "@astrojs/cloudflare": "^14.1.6",
     "@astrojs/markdoc": "^2.0.5",
+    "@astrojs/markdown-remark": "^7.2.2",
+    "@astrojs/mdx": "^7.0.5",
     "@astrojs/react": "^6.0.1",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@keystatic/astro": "^5.2.0",
     "@keystatic/core": "^0.6.3",
+    "@tailwindcss/vite": "^4.3.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "astro": "^7.1.4",
+    "astro": "^7.1.5",
+    "dayjs": "^1.11.21",
+    "lodash.kebabcase": "^4.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "rehype-callouts": "^2.2.0",
+    "remark-collapse": "^0.1.2",
+    "remark-toc": "^9.0.0",
+    "slugify": "^1.6.9",
+    "tailwindcss": "^4.3.2",
     "wrangler": "^4.114.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@pagefind/default-ui": "^1.5.2",
+    "@shikijs/transformers": "^4.3.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/lodash.kebabcase": "^4.1.9",
+    "pagefind": "^1.5.2",
+    "typescript": "^6.0.3"
   }
 }

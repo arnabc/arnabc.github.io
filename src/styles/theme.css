@@ -1,0 +1,122 @@
+/**
+ * Design tokens, modelled on aihero.dev.
+ *
+ * Two ideas carry the whole look:
+ *   1. Near-monochrome surfaces — a page tint behind a slightly lighter
+ *      content surface — with a single amber accent that only becomes the
+ *      link/accent colour in dark mode. In light mode the accent is the
+ *      foreground itself, and amber is reserved for filled buttons.
+ *   2. Every border, hover and divider is an *alpha overlay of the
+ *      foreground*, never a separately-picked grey. That is what keeps the
+ *      chrome from competing with the text.
+ */
+
+@theme inline {
+  --color-page: var(--page-background);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-fill: var(--accent-fill);
+  --color-fill-hover: var(--accent-fill-hover);
+  --color-fill-foreground: var(--accent-fill-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Text opacity ladder — body is never full-strength foreground. */
+  --color-body: var(--fg-body);
+  --color-subtle: var(--fg-subtle);
+  --color-label: var(--fg-label);
+  --color-faint: var(--fg-faint);
+
+  --color-border: var(--line);
+  --color-border-strong: var(--line-strong);
+  --color-border-soft: var(--line-soft);
+  --color-hover: var(--hover);
+  --color-band: var(--band);
+
+  --radius-app: var(--radius);
+}
+
+/**
+ * Font tokens. These must be a *non-inline* `@theme` so Tailwind emits them as
+ * real custom properties: Astro's font API defines `--font-dm-sans` & co. in an
+ * inline <style> that the Tailwind stylesheet follows in the head, so reusing
+ * Tailwind's own `--font-sans`/`--font-serif`/`--font-mono` names for the Astro
+ * variables would let Tailwind's default stacks win the cascade and silently
+ * drop the webfonts.
+ */
+@theme {
+  --font-sans:
+    var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, Cambria, serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
+    monospace;
+}
+
+/* ===== Light ===== */
+:root,
+[data-theme="light"] {
+  --page-background: #f1f2f5;
+  --background: #fbfbfc;
+  --foreground: #14161a;
+  --card: #ffffff;
+
+  --accent: #14161a;
+  --accent-foreground: #fbfbfc;
+  --accent-fill: #f5c451;
+  --accent-fill-hover: #eab534;
+  --accent-fill-foreground: #191510;
+
+  --muted: #f5f6f8;
+  --muted-foreground: #14161a9e;
+
+  --fg-body: #14161acc;
+  --fg-subtle: #14161aa3;
+  --fg-label: #14161a99;
+  --fg-faint: #14161a59;
+
+  --line: #14161a1a;
+  --line-strong: #14161a24;
+  --line-soft: #14161a12;
+  --hover: #14161a0f;
+  --band: #f1f2f5;
+
+  --radius: 9px;
+  color-scheme: light;
+}
+
+/* ===== Dark ===== */
+[data-theme="dark"] {
+  --page-background: #080808;
+  --background: #0b0b0b;
+  --foreground: #f4f3f1;
+  --card: #100f0e;
+
+  --accent: #f5c451;
+  --accent-foreground: #191510;
+  --accent-fill: #f5c451;
+  --accent-fill-hover: #ffd873;
+  --accent-fill-foreground: #191510;
+
+  --muted: #0d0d0c;
+  --muted-foreground: #f4f3f199;
+
+  --fg-body: #f4f3f1b8;
+  --fg-subtle: #f4f3f185;
+  --fg-label: #f4f3f17a;
+  --fg-faint: #f4f3f14d;
+
+  --line: #ffffff14;
+  --line-strong: #ffffff1f;
+  --line-soft: #ffffff0f;
+  --hover: #ffffff12;
+  --band: #0e0e0d;
+
+  color-scheme: dark;
+}

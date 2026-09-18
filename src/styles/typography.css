@@ -1,0 +1,176 @@
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  /**
+   * Article typography, modelled on aihero.dev:
+   *   - 17.5px / 1.68 body copy at --fg-body (never full-strength foreground)
+   *   - headings in the sans face, tight tracking, generous space above
+   *   - blockquotes are the one place the serif face appears
+   *   - links are plain-coloured with a faint underline that firms on hover
+   */
+  .app-prose {
+    @apply prose max-w-none;
+
+    font-size: 17.5px;
+    line-height: 1.68;
+    @apply text-body;
+
+    p {
+      @apply text-body;
+      text-wrap: pretty;
+      margin: 0 0 1.25em;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    th {
+      @apply text-foreground;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      @apply mt-12 mb-4 text-[1.55em] font-bold;
+    }
+
+    h3 {
+      @apply mt-9 mb-3 text-[1.2em] font-semibold not-italic;
+    }
+
+    h4 {
+      @apply mt-8 mb-2 text-[1.05em] font-semibold;
+    }
+
+    strong {
+      @apply text-foreground font-bold;
+    }
+
+    a {
+      @apply text-foreground wrap-break-word underline decoration-1 underline-offset-2;
+      text-decoration-color: var(--fg-faint);
+
+      &:hover {
+        text-decoration-color: var(--foreground);
+      }
+
+      &:focus-visible {
+        @apply no-underline;
+      }
+    }
+
+    ul,
+    ol {
+      @apply text-body;
+    }
+
+    ul {
+      @apply overflow-x-clip;
+    }
+
+    li {
+      @apply marker:text-faint;
+      @apply my-1;
+    }
+
+    hr {
+      @apply border-border my-11 border-t;
+    }
+
+    /* The serif face earns its place here and nowhere else. */
+    blockquote {
+      @apply border-accent text-foreground my-9 border-s-2 py-0.5 ps-6 font-normal not-italic opacity-100;
+      font-family: var(--font-serif);
+      font-size: 1.32em;
+      line-height: 1.45;
+      letter-spacing: -0.005em;
+      text-wrap: pretty;
+
+      p {
+        @apply text-foreground m-0;
+        font: inherit;
+        letter-spacing: inherit;
+      }
+    }
+
+    img {
+      @apply border-border rounded-(--radius) mx-auto border;
+    }
+
+    img[role="button"] {
+      @apply cursor-zoom-in;
+
+      &:focus-visible {
+        @apply outline-accent outline-2 outline-offset-2;
+      }
+    }
+
+    figcaption {
+      font-family: var(--font-mono);
+      @apply text-subtle mt-2 text-center text-[12.5px] opacity-100;
+    }
+
+    table {
+      @apply text-body text-[0.94em];
+
+      th,
+      td {
+        @apply border-border border p-2;
+      }
+
+      th {
+        @apply py-1.5;
+      }
+    }
+
+    code {
+      font-family: var(--font-mono);
+      @apply bg-hover text-foreground rounded border-0 px-1.5 py-0.5 text-[0.86em] font-normal wrap-break-word before:content-none after:content-none;
+    }
+
+    .astro-code code {
+      @apply flex-[1_0_100%] bg-inherit p-0 text-[13.5px];
+    }
+
+    details:not(.callout) {
+      @apply text-body inline-block cursor-pointer select-none [&_p]:hidden [&_ul]:my-0!;
+    }
+
+    summary {
+      @apply focus-visible:outline-accent focus-visible:outline-2 focus-visible:outline-offset-1;
+    }
+
+    pre {
+      @apply rounded-(--radius) focus-visible:outline-accent focus-visible:border-transparent focus-visible:outline-2;
+    }
+  }
+
+  /* ===== Code Blocks & Syntax Highlighting ===== */
+  .astro-code {
+    font-family: var(--font-mono);
+    @apply outline-border rounded-(--radius) flex border bg-(--shiki-light-bg) text-(--shiki-light) [&_span]:text-(--shiki-light);
+  }
+
+  html[data-theme="dark"] .astro-code {
+    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+  }
+
+  /* Styles for Shiki transformers */
+  /* https://shiki.style/packages/transformers */
+  .astro-code {
+    .line.diff.add {
+      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
+    }
+    .line.diff.remove {
+      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
+    }
+    .line.highlighted {
+      @apply inline-block w-full bg-slate-400/20;
+    }
+    .highlighted-word {
+      @apply border-border rounded-sm border px-0.5 py-px;
+    }
+  }
+}

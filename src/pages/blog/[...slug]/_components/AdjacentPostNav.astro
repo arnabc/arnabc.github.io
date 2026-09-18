@@ -1,0 +1,61 @@
+---
+import IconArrowLeft from "@/assets/icons/IconArrowLeft.svg";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import { getPostUrl } from "@/utils/getPostPaths";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+type AdjacentPost = {
+  id: string;
+  title: string;
+  pubDatetime: Date;
+} | null;
+
+type Props = {
+  prevPost: AdjacentPost;
+  nextPost: AdjacentPost;
+};
+
+const { prevPost, nextPost } = Astro.props;
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+---
+
+<nav
+  data-pagefind-ignore
+  aria-label="Adjacent posts"
+  class="my-10 grid grid-cols-1 gap-3 sm:grid-cols-2"
+>
+  {
+    prevPost && (
+      <a
+        href={getPostUrl(prevPost.id, prevPost.pubDatetime, locale)}
+        class="group border-border hover:border-border-strong hover:bg-hover rounded-(--radius) flex w-full flex-col gap-1.5 border p-4 transition-colors"
+      >
+        <span class="label-mono flex items-center gap-1.5">
+          <IconArrowLeft class="size-3.5 transition-transform group-hover:-translate-x-0.5 rtl:rotate-180" />
+          {t.post.previousPost}
+        </span>
+        <span class="text-foreground text-[15px] leading-snug font-medium text-pretty">
+          {prevPost.title}
+        </span>
+      </a>
+    )
+  }
+  {
+    nextPost && (
+      <a
+        href={getPostUrl(nextPost.id, nextPost.pubDatetime, locale)}
+        class="group border-border hover:border-border-strong hover:bg-hover rounded-(--radius) flex w-full flex-col items-end gap-1.5 border p-4 text-end transition-colors sm:col-start-2"
+      >
+        <span class="label-mono flex items-center gap-1.5">
+          {t.post.nextPost}
+          <IconArrowRight class="size-3.5 transition-transform group-hover:translate-x-0.5 rtl:rotate-180" />
+        </span>
+        <span class="text-foreground text-[15px] leading-snug font-medium text-pretty">
+          {nextPost.title}
+        </span>
+      </a>
+    )
+  }
+</nav>

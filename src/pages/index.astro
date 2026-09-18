@@ -1,46 +1,166 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { postUrl } from '../lib/postUrl';
-import { site } from '../site.config';
+import { getCollection, getEntry } from "astro:content";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import IconRss from "@/assets/icons/IconRss.svg";
+import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Card from "@/components/Card.astro";
+import LinkButton from "@/components/LinkButton.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getUniqueTags } from "@/utils/getUniqueTags";
+import { slugifyAll } from "@/utils/slugify";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
 
-const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const { posts: postsConfig } = config;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+
+const posts = await getCollection("posts");
+const sortedPosts = getSortedPosts(posts);
+const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
+const homePath = getRelativeLocaleUrl(locale, "");
+
+// Topic list for the "browse by topic" grid, ordered by how much has actually
+// been written about each one rather than alphabetically.
+const topics = getUniqueTags(posts)
+  .map(({ tag, tagName }) => ({
+    tag,
+    tagName,
+    count: posts.filter(({ data }) => slugifyAll(data.tags).includes(tag))
+      .length,
+  }))
+  .sort((a, b) => b.count - a.count || a.tagName.localeCompare(b.tagName))
+  .slice(0, 8);
+
+// The hero lead is the opening paragraph of the About page, so there is only
+// one place to edit the site's self-description.
+const about = await getEntry("pages", "about");
+const heroLead = (about?.body ?? "")
+  .split(/\n\s*\n/)
+  .map(block => block.trim())
+  .find(block => block && !block.startsWith("#") && !block.startsWith("---"))
+  ?.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1") // links → their text
+  .replace(/[*_`]/g, "") // emphasis markers
+  .replace(/\s+/g, " ");
 ---
 
-<BaseLayout title={site.title} description={site.tagline}>
-  <h1>Posts</h1>
-  <ul class="post-list">
-    {posts.map((post) => (
-      <li>
-        <a href={postUrl(post)}>{post.data.title}</a>
-        <time datetime={post.data.date.toISOString()}>
-          {post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
-        </time>
-      </li>
-    ))}
-  </ul>
-</BaseLayout>
+<Layout>
+  <Header />
+  <main
+    id="main-content"
+    data-layout="index"
+    data-home-path={homePath}
+    class="app-layout"
+  >
+    <section id="hero" class="border-border border-b py-14 sm:py-20">
+      <p class="label-mono">{config.site.description}</p>
+      <h1
+        class="mt-4 text-[2.1rem] leading-[1.1] font-bold sm:text-[3rem] sm:leading-[1.05]"
+      >
+        {config.site.title}
+      </h1>
+      {
+        heroLead && (
+          <p class="text-body mt-5 max-w-xl text-[17px] leading-relaxed text-pretty">
+            {heroLead}
+          </p>
+        )
+      }
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <LinkButton variant="fill" href={getRelativeLocaleUrl(locale, "blog")}>
+          {t.home.allPosts}
+          <IconArrowRight
+            class="size-4 transition-transform group-hover:translate-x-0.5 rtl:-rotate-180"
+          />
+        </LinkButton>
+        <LinkButton variant="ghost" href={getRelativeLocaleUrl(locale, "about")}>
+          {t.nav.about}
+        </LinkButton>
+        <a
+          href={`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}atom.xml`}
+          class="text-subtle hover:text-foreground hover:bg-hover rounded-(--radius) grid size-9 place-items-center transition-colors"
+          aria-label="RSS Feed"
+          title="RSS Feed"
+        >
+          <IconRss class="size-4 rtl:-rotate-90" />
+          <span class="sr-only">RSS Feed</span>
+        </a>
+      </div>
+    </section>
 
-<style>
-  .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+    {
+      featuredPosts.length > 0 && (
+        <section id="featured" class="border-border border-b py-12">
+          <h2 class="label-mono mb-2">{t.home.featured}</h2>
+          <ul>
+            {featuredPosts.map(data => (
+              <Card variant="h3" {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
-  .post-list li {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--border);
-  }
+    {
+      recentPosts.length > 0 && (
+        <section id="recent-posts" class="border-border border-b py-12">
+          <div class="mb-2 flex items-baseline justify-between gap-4">
+            <h2 class="label-mono">{t.home.recentPosts}</h2>
+            <LinkButton
+              href={getRelativeLocaleUrl(locale, "blog")}
+              class="text-subtle text-[13px] font-medium"
+            >
+              {t.home.allPosts}
+              <IconArrowRight class="size-3.5 transition-transform group-hover:translate-x-0.5 rtl:-rotate-180" />
+            </LinkButton>
+          </div>
+          <ul>
+            {recentPosts.slice(0, postsConfig.perIndex).map(data => (
+              <Card variant="h3" {...data} />
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
-  .post-list time {
-    color: var(--muted);
-    white-space: nowrap;
-    font-size: 0.9rem;
-  }
-</style>
+    {
+      topics.length > 0 && (
+        <section id="topics" class="py-12">
+          <h2 class="label-mono mb-5">{t.home.browseByTopic}</h2>
+          <ul class="grid gap-2 sm:grid-cols-2">
+            {topics.map(({ tag, tagName, count }) => (
+              <li>
+                <a
+                  href={getRelativeLocaleUrl(locale, `blog/categories/${tag}/`)}
+                  class="border-border hover:border-border-strong hover:bg-hover rounded-(--radius) flex items-baseline justify-between gap-3 border px-4 py-3 transition-colors"
+                >
+                  <span class="text-foreground text-[15px] font-medium">
+                    {tagName}
+                  </span>
+                  <span class="label-mono">{count}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const indexLayout = (document.querySelector("#main-content") as HTMLElement)
+      ?.dataset;
+    const baseRoot = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+    if (indexLayout?.layout) {
+      sessionStorage.setItem("backUrl", indexLayout.homePath ?? baseRoot);
+    }
+  });
+</script>

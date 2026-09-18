@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = {
+  disabled?: boolean;
+  /** "fill" is the amber CTA; "ghost" is a quiet bordered link. */
+  variant?: "plain" | "fill" | "ghost";
+} & HTMLAttributes<"a">;
+
+const { disabled, variant = "plain", class: className, ...attrs } = Astro.props;
+
+const Button = disabled ? "span" : "a";
+
+const variants = {
+  plain: "hover:text-foreground transition-colors",
+  fill: "bg-fill text-fill-foreground hover:bg-fill-hover rounded-(--radius) px-4 py-2 text-sm font-semibold transition-colors",
+  ghost:
+    "border-border hover:border-border-strong hover:bg-hover hover:text-foreground rounded-(--radius) border px-4 py-2 text-sm font-medium transition-colors",
+};
+---
+
+<Button
+  aria-disabled={disabled}
+  class:list={[
+    "group inline-flex items-center gap-1.5",
+    !disabled && variants[variant],
+    className,
+  ]}
+  {...attrs}
+>
+  <slot />
+</Button>

@@ -1,23 +1,40 @@
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { defineCollection } from "astro:content";
+import { z } from "astro/zod";
+import { glob } from "astro/loaders";
+import config from "@/config";
 
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.mdoc', base: './src/content/blog' }),
+export const BLOG_PATH = "src/content/blog";
+
+const posts = defineCollection({
+  loader: glob({ pattern: "**/[^_]*.{md,mdx,mdoc}", base: `./${BLOG_PATH}` }),
+  schema: ({ image }) =>
+    z.object({
+      author: z.string().default(config.site.author),
+      pubDatetime: z.date(),
+      modDatetime: z.date().optional().nullable(),
+      title: z.string(),
+      featured: z.boolean().optional(),
+      draft: z.boolean().optional(),
+      tags: z.array(z.string()).default(["others"]),
+      ogImage: image().or(z.string()).optional(),
+      description: z.string(),
+      canonicalURL: z.string().optional(),
+      hideEditPost: z.boolean().optional(),
+      timezone: z.string().optional(),
+    }),
+});
+
+const pages = defineCollection({
+  loader: glob({
+    pattern: "**/[^_]*.{md,mdx,mdoc}",
+    base: "./src/content/pages",
+  }),
   schema: z.object({
     title: z.string(),
-    date: z.coerce.date(),
-    tags: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-    description: z.string(),
+    description: z.string().optional(),
+    ogImage: z.string().optional(),
+    canonicalURL: z.string().optional(),
   }),
 });
 
-const about = defineCollection({
-  loader: glob({ pattern: 'about.mdoc', base: './src/content' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-  }),
-});
-
-export const collections = { blog, about };
+export const collections = { posts, pages };

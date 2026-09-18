@@ -1,5 +1,6 @@
 # build output
 dist/
+public/pagefind/
 # generated types
 .astro/
 
@@ -26,3 +27,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# claude code
+.claude/

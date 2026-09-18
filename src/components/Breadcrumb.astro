@@ -1,0 +1,117 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { stripBase, stripLocale } from "@/utils/withBase";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+
+// Strip base prefix and trailing slash, then locale prefix so segments
+// reflect the logical page path only.
+const pathWithoutBase = stripBase(Astro.url.pathname).replace(/\/+$/, "");
+const currentUrlPath = stripLocale(pathWithoutBase, locale);
+
+// Get url array from path
+// eg: /about => ['about']
+const segments = currentUrlPath.split("/").slice(1).filter(Boolean);
+
+const decodeSegment = (value: string) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
+const navLabels: Record<string, string> = {
+  about: t.nav.about,
+  search: t.nav.search,
+};
+
+type Crumb = { label: string; href?: string };
+
+const path = (...parts: string[]) =>
+  getRelativeLocaleUrl(locale, parts.join("/"));
+
+// Our routes nest everything under /blog/ (post dates, archives, categories),
+// so build an explicit breadcrumb trail per route shape rather than deriving
+// generic per-segment links from raw path segments (which breaks once a
+// segment stands in for multiple path parts, e.g. a collapsed "Posts" label
+// for /blog/YYYY/MM).
+let crumbs: Crumb[];
+
+if (segments[0] === "blog") {
+  const [, second, third, fourth] = segments;
+
+  if (second === "archives") {
+    // /blog/archives/ => Home > Archives
+    crumbs = [{ label: t.nav.archives }];
+  } else if (second === "categories") {
+    if (third === undefined) {
+      // /blog/categories/ => Home > Tags
+      crumbs = [{ label: t.nav.tags }];
+    } else {
+      // /blog/categories/<tag>/[page] => Home > Tags > <tag> (page N)
+      const pageSuffix =
+        fourth === undefined || Number(fourth) === 1
+          ? ""
+          : ` (${t.pagination.page.toLowerCase()} ${fourth})`;
+      crumbs = [
+        { label: t.nav.tags, href: path("blog", "categories") },
+        { label: `${decodeSegment(third)}${pageSuffix}` },
+      ];
+    }
+  } else if (!isNaN(Number(second)) || second === undefined) {
+    // /blog or /blog/[page] => Home > Posts (page N)
+    crumbs = [
+      {
+        label: `${t.nav.posts} (${t.pagination.page.toLowerCase()} ${second || 1})`,
+      },
+    ];
+  } else {
+    // /blog/YYYY/MM/slug => Home > Posts > slug
+    crumbs = [
+      { label: t.nav.posts, href: path("blog") },
+      { label: decodeSegment(fourth ?? "") },
+    ];
+  }
+} else {
+  // Top-level pages (about, search, …): one crumb per segment, same as before.
+  crumbs = segments.map((segment, index) => ({
+    label: navLabels[segment] ?? decodeSegment(segment),
+    href: index + 1 === segments.length ? undefined : path(segment),
+  }));
+}
+---
+
+<nav class="app-layout pt-6" aria-label="breadcrumb">
+  <ul class="label-mono flex flex-wrap items-center gap-x-1.5">
+    <li class="flex items-center gap-x-1.5">
+      <a href={getRelativeLocaleUrl(locale, "")} class="hover:text-foreground transition-colors">
+        {t.nav.home}
+      </a>
+      <span aria-hidden="true" class="text-faint">/</span>
+    </li>
+    {
+      crumbs.map((crumb, index) =>
+        index + 1 === crumbs.length ? (
+          <li>
+            <span class="text-subtle" aria-current="page">
+              {crumb.label}
+            </span>
+          </li>
+        ) : (
+          <li class="flex items-center gap-x-1.5">
+            <a href={crumb.href} class="hover:text-foreground transition-colors">
+              {crumb.label}
+            </a>
+            <span aria-hidden="true" class="text-faint">
+              /
+            </span>
+          </li>
+        )
+      )
+    }
+  </ul>
+</nav>
