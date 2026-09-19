@@ -4,7 +4,9 @@ export default defineAstroPaperConfig({
   site: {
     url: "https://arnab.ch/",
     title: "Arnab Chakraborty",
-    description: "A cognitive perspective on web.",
+    tagline: "What building things teaches you",
+    description:
+      "Arnab Chakraborty on software, scale and security — working through what a decade of building Scalefusion, and the team behind it, actually taught me.",
     author: "Arnab Chakraborty",
     ogImage: "default-og.jpg",
     lang: "en",

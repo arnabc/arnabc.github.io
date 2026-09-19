@@ -3,6 +3,11 @@ interface SiteConfig {
   url: string;
   /** Blog title shown in header and meta tags */
   title: string;
+  /**
+   * Short line shown above the title in the homepage hero. Rendered in
+   * uppercase, so keep it to a few words. Falls back to `description`.
+   */
+  tagline?: string;
   /** Short description used in SEO meta and RSS feed */
   description: string;
   /** Default post author name */
@@ -107,6 +112,7 @@ type ResolvedSiteConfig = Required<
     SiteConfig,
     | "url"
     | "title"
+    | "tagline"
     | "description"
     | "author"
     | "lang"

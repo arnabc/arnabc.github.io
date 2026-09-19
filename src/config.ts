@@ -13,6 +13,7 @@ const DEFAULT_OG_IMAGE = "default-og.jpg";
 const config: ResolvedAstroPaperConfig = {
   site: {
     ...userConfig.site,
+    tagline: userConfig.site.tagline ?? userConfig.site.description,
     ogImage: userConfig.site.ogImage ?? DEFAULT_OG_IMAGE,
     lang: userConfig.site.lang ?? "en",
     timezone: userConfig.site.timezone ?? "UTC",
