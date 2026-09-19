@@ -21,11 +21,11 @@ const { title, description, ...props } = data;
     <Datetime {...props} class="mb-2" />
     <Heading
       transition:name={toTransitionName(title)}
-      class="text-foreground text-lg leading-snug font-bold sm:text-xl"
+      class="text-foreground text-[16px] leading-snug font-semibold sm:text-[17.5px]"
     >
       {title}
     </Heading>
-    <p class="text-body mt-2 text-[15.5px] leading-relaxed text-pretty">
+    <p class="text-body mt-2 text-[14.5px] leading-relaxed text-pretty">
       {description}
     </p>
   </a>

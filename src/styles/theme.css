@@ -43,20 +43,20 @@
 
 /**
  * Font tokens. These must be a *non-inline* `@theme` so Tailwind emits them as
- * real custom properties: Astro's font API defines `--font-dm-sans` & co. in an
+ * real custom properties: Astro's font API defines `--font-geist` & co. in an
  * inline <style> that the Tailwind stylesheet follows in the head, so reusing
  * Tailwind's own `--font-sans`/`--font-serif`/`--font-mono` names for the Astro
  * variables would let Tailwind's default stacks win the cascade and silently
  * drop the webfonts.
+ *
+ * Roles: mono carries body copy and code, sans is headings and UI chrome,
+ * serif appears only in blockquotes (italic).
  */
 @theme {
-  --font-sans:
-    var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji";
-  --font-serif: var(--font-source-serif), ui-serif, Georgia, Cambria, serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Noto Serif", ui-serif, Georgia, serif;
   --font-mono:
-    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
-    monospace;
+    "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
 }
 
 /* ===== Light ===== */

@@ -1,5 +1,4 @@
 ---
-import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
@@ -45,16 +44,6 @@ const rssHref = getRelativeLocaleUrl(
     <link rel="canonical" href={canonicalURL} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Fonts: DM Sans (UI + headings), Source Serif 4 (quotes), JetBrains Mono (code) -->
-    <Font
-      cssVariable="--font-dm-sans"
-      preload={[
-        { subset: "latin", weight: 400, style: "normal" },
-        { subset: "latin", weight: 700, style: "normal" },
-      ]}
-    />
-    <Font cssVariable="--font-source-serif" />
-    <Font cssVariable="--font-jetbrains-mono" />
 
     <!-- Primary meta -->
     <title>{title}</title>
@@ -133,7 +122,7 @@ const rssHref = getRelativeLocaleUrl(
     }
   </head>
   <body
-    class="bg-page font-sans text-body selection:bg-fill selection:text-fill-foreground antialiased"
+    class="bg-page font-mono text-body selection:bg-fill selection:text-fill-foreground antialiased"
   >
     <div class="site-shell flex min-h-svh flex-col">
       <slot />

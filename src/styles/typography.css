@@ -11,14 +11,18 @@
   .app-prose {
     @apply prose max-w-none;
 
-    font-size: 17.5px;
-    line-height: 1.68;
+    /* Flat 15px/1.65, matching omarchy.org, which sets the same JetBrains
+       Mono body copy. The measure is capped in ch, which for a monospace
+       face is exactly 70 characters. */
+    font-size: 15px;
+    line-height: 1.65;
+    max-width: 70ch;
     @apply text-body;
 
     p {
       @apply text-body;
       text-wrap: pretty;
-      margin: 0 0 1.25em;
+      margin: 0 0 1em;
     }
 
     h1,
@@ -29,19 +33,19 @@
     h6,
     th {
       @apply text-foreground;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
     }
 
     h2 {
-      @apply mt-12 mb-4 text-[1.55em] font-bold;
+      @apply mt-9 mb-3 text-[1.25rem] leading-[1.35] font-semibold;
     }
 
     h3 {
-      @apply mt-9 mb-3 text-[1.2em] font-semibold not-italic;
+      @apply mt-8 mb-2 text-[1.05rem] leading-[1.4] font-semibold not-italic;
     }
 
     h4 {
-      @apply mt-8 mb-2 text-[1.05em] font-semibold;
+      @apply mt-7 mb-2 text-[1rem] leading-[1.45] font-semibold;
     }
 
     strong {
@@ -70,9 +74,13 @@
       @apply overflow-x-clip;
     }
 
+    ul {
+      list-style: square;
+    }
+
     li {
       @apply marker:text-faint;
-      @apply my-1;
+      margin-bottom: 0.35em;
     }
 
     hr {
@@ -81,16 +89,18 @@
 
     /* The serif face earns its place here and nowhere else. */
     blockquote {
-      @apply border-accent text-foreground my-9 border-s-2 py-0.5 ps-6 font-normal not-italic opacity-100;
+      @apply border-accent text-foreground my-6 border-s-2 py-1 ps-5 font-normal opacity-100;
       font-family: var(--font-serif);
-      font-size: 1.32em;
-      line-height: 1.45;
-      letter-spacing: -0.005em;
+      font-size: 16px;
+      font-style: italic;
+      line-height: 1.55;
+      letter-spacing: 0;
       text-wrap: pretty;
 
       p {
         @apply text-foreground m-0;
         font: inherit;
+        font-style: italic;
         letter-spacing: inherit;
       }
     }
@@ -109,11 +119,11 @@
 
     figcaption {
       font-family: var(--font-mono);
-      @apply text-subtle mt-2 text-center text-[12.5px] opacity-100;
+      @apply text-subtle mt-2 text-center text-[13px] opacity-100;
     }
 
     table {
-      @apply text-body text-[0.94em];
+      @apply text-body text-[14px];
 
       th,
       td {
@@ -131,7 +141,7 @@
     }
 
     .astro-code code {
-      @apply flex-[1_0_100%] bg-inherit p-0 text-[13.5px];
+      @apply flex-[1_0_100%] bg-inherit p-0 text-[13px];
     }
 
     details:not(.callout) {

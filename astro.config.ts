@@ -1,9 +1,4 @@
-import {
-  defineConfig,
-  envField,
-  fontProviders,
-  svgoOptimizer,
-} from "astro/config";
+import { defineConfig, envField, svgoOptimizer } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import markdoc from "@astrojs/markdoc";
@@ -66,35 +61,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  fonts: [
-    {
-      name: "DM Sans",
-      cssVariable: "--font-dm-sans",
-      provider: fontProviders.google(),
-      fallbacks: ["ui-sans-serif", "system-ui", "sans-serif"],
-      weights: [400, 500, 600, 700],
-      styles: ["normal", "italic"],
-      formats: ["woff2", "woff"],
-    },
-    {
-      name: "Source Serif 4",
-      cssVariable: "--font-source-serif",
-      provider: fontProviders.google(),
-      fallbacks: ["ui-serif", "Georgia", "Cambria", "serif"],
-      weights: [400, 600],
-      styles: ["normal", "italic"],
-      formats: ["woff2", "woff"],
-    },
-    {
-      name: "JetBrains Mono",
-      cssVariable: "--font-jetbrains-mono",
-      provider: fontProviders.google(),
-      fallbacks: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
-      weights: [400, 500],
-      styles: ["normal"],
-      formats: ["woff2", "woff"],
-    },
-  ],
   env: {
     schema: {
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
