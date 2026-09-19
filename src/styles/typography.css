@@ -157,30 +157,83 @@
     }
   }
 
-  /* ===== Code Blocks & Syntax Highlighting ===== */
-  .astro-code {
+  /* ===== Code Blocks & Syntax Highlighting =====
+   *
+   * Both class names matter. Astro's own markdown pipeline emits
+   * `.astro-code`; Markdoc's fence node in markdoc.config.mjs calls Shiki
+   * directly and emits `.shiki`. Posts here are .mdoc, so `.shiki` is the one
+   * that actually applies — styling only `.astro-code` leaves every token
+   * uncoloured, because `defaultColor: false` makes Shiki write
+   * --shiki-light/--shiki-dark custom properties and no real `color`.
+   */
+  .astro-code,
+  .shiki {
     font-family: var(--font-mono);
-    @apply outline-border rounded-(--radius) flex border bg-(--shiki-light-bg) text-(--shiki-light) [&_span]:text-(--shiki-light);
+    /* Deliberately NOT `position: relative`. The copy button and the
+       file-name label are absolutely positioned above this box's top edge,
+       and their containing block is the wrapper <div> the copy-button script
+       adds around each <pre>. An overflow clip only catches absolutely
+       positioned descendants whose containing block it contains, so while
+       that wrapper stays the containing block they escape the clip below.
+       Making this element `relative` pulls them into it and shears them. */
+    @apply border-border bg-muted rounded-(--radius) overflow-x-auto border;
+    padding: 0.9rem 1.05rem;
+    font-size: 13px;
+    line-height: 1.6;
+
+    /* The theme supplies token hues only; the block's own background comes
+       from the palette, so it can't clash with the page the way night-owl's
+       #011627 did against a near-black background. */
+    color: var(--shiki-light);
+
+    span {
+      color: var(--shiki-light);
+      font-style: var(--shiki-light-font-style);
+      font-weight: var(--shiki-light-font-weight);
+    }
   }
 
-  html[data-theme="dark"] .astro-code {
-    @apply bg-(--shiki-dark-bg) text-(--shiki-dark) [&_span]:text-(--shiki-dark);
+  html[data-theme="dark"] {
+    .astro-code,
+    .shiki {
+      color: var(--shiki-dark);
+
+      span {
+        color: var(--shiki-dark);
+        font-style: var(--shiki-dark-font-style);
+        font-weight: var(--shiki-dark-font-weight);
+      }
+    }
+  }
+
+  .astro-code code,
+  .shiki code {
+    @apply bg-transparent p-0 text-inherit before:content-none after:content-none;
+    font-size: inherit;
+  }
+
+  .astro-code .line,
+  .shiki .line {
+    display: inline-block;
+    min-width: 100%;
   }
 
   /* Styles for Shiki transformers */
   /* https://shiki.style/packages/transformers */
-  .astro-code {
+  .astro-code,
+  .shiki {
     .line.diff.add {
-      @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
+      @apply relative inline-block w-full bg-green-500/15 before:absolute before:-left-3 before:text-green-500 before:content-['+'];
     }
     .line.diff.remove {
-      @apply relative inline-block w-full bg-red-500/20 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
+      @apply relative inline-block w-full bg-red-500/15 before:absolute before:-left-3 before:text-red-500 before:content-['-'];
     }
     .line.highlighted {
-      @apply inline-block w-full bg-slate-400/20;
+      @apply bg-hover inline-block w-full;
     }
     .highlighted-word {
       @apply border-border rounded-sm border px-0.5 py-px;
     }
   }
+
 }
