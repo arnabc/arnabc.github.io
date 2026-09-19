@@ -1,16 +1,16 @@
 ---
-title: "Android - How to send gzipped JSON in HTTP request"
+title: "Android - How to send gzipped JSON in an HTTP request"
 pubDatetime: 2012-09-30T18:41:00Z
 tags: ["Android", "gzip"]
 draft: false
 description: "A simple technique to gzip JSON request bodies in Android HTTP requests to reduce network latency and mobile data usage."
 ---
 
-If you have ever developed an Android application which sends and consumes large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e saves $$$ in fact).
+If you have ever developed an Android application which sends and consumes a large amount of JSON data without gzipping then this post is probably for you. This is a very simple optimization technique that you can implement which vastly reduces the network latency and also benefits the users as well as the internet. The idea is to transfer less data over the network and once you do that, it improves the speed of your application and helps users by reducing their mobile data usage (i.e. saves $$$ in fact).
 
-The [`AndroidHttpClient`][1] module offers a way to achieve this, when you're sending JSON requests you can gzip the content of the request params and add some necessary HTTP headers, which will provide a hint to your server that it has to decode the content before it is usable. Needless to say that this technique is not just limited to sending JSON, you can of course use it if you're sending CSV or text file over the network to server.
+The [`AndroidHttpClient`][1] module offers a way to achieve this, when you're sending JSON requests you can gzip the content of the request params and add some necessary HTTP headers, which will provide a hint to your server that it has to decode the content before it is usable. Needless to say, this technique is not just limited to sending JSON, you can of course use it if you're sending a CSV or text file over the network to a server.
 
-I'll show a way how this can be done using a Rails backend (that's what I use), but I presume this should not be too difficult to implement in case you're not using Rails. I'll be using JSON as an example here:
+I'll show how this can be done using a Rails backend (that's what I use), but I presume this should not be too difficult to implement in case you're not using Rails. I'll be using JSON as an example here:
 
 
 To encode or decode the JSON content you can use the following utility module in Android:
@@ -102,7 +102,7 @@ public class Util {
 
 ```
 
-The HTTP header, which indicates to server that the request content is gzipped, is `Content-Encoding: gzip`. On the Rails side you can use the following **Rack** middleware to decode JSON requests (you can set your webserver for example nginx to do the encoding on JSON responses):
+The HTTP header, which indicates to the server that the request content is gzipped, is `Content-Encoding: gzip`. On the Rails side you can use the following **Rack** middleware to decode JSON requests (you can set your webserver for example nginx to do the encoding on JSON responses):
 
 A Rack middleware to decode the gzipped JSON, thanks to this [gist][2] by [relistan][3]:
 
@@ -143,7 +143,7 @@ class CompressedRequests
 end
 ```
 
-Now put this in somewhere in your Rails web application directory for example `lib/middleware`, just make sure that the file is loaded when Rails boots. To include the file in Rails' __autoload__ path, add it like this:
+Now put this somewhere in your Rails web application directory for example `lib/middleware`, just make sure that the file is loaded when Rails boots. To include the file in Rails' __autoload__ path, add it like this:
 
 **application.rb**
 ```ruby
@@ -159,7 +159,7 @@ Once that is done, then you need to add this tiny little Rack app as a middlewar
 config.middleware.insert_before ActionDispatch::ParamsParser, "CompressedRequests"
 ```
 
-That's all you need both on client and server to send and receive Gzipped content. If you're sending JSON from client and you wan't rails to interpret it as JSON, then don't forget to add `Content-Type: application/json` on your HTTP Request header.
+That's all you need both on client and server to send and receive Gzipped content. If you're sending JSON from the client and you want Rails to interpret it as JSON, then don't forget to add `Content-Type: application/json` in your HTTP request header.
 
 
 Happy coding! If you have anything to say feel free to contact me on Twitter [@arnabc][4]

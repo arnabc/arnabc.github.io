@@ -6,7 +6,7 @@ export default defineAstroPaperConfig({
     title: "Arnab Chakraborty",
     tagline: "What building things teaches you",
     description:
-      "Arnab Chakraborty on software, scale and security — working through what a decade of building Scalefusion, and the team behind it, actually taught me.",
+      "Arnab Chakraborty on software, scale and security — working through what a decade of building Scalefusion, and the team behind it, actually taught him.",
     author: "Arnab Chakraborty",
     ogImage: "default-og.jpg",
     lang: "en",
